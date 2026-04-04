@@ -1,0 +1,50 @@
+# === VIPER Forensic Engine .gitignore ===
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment secrets
+.env
+
+# Data — large, download separately
+data/cifake/
+data/wikiart/
+data/Art/
+
+# Model checkpoints (binary, large)
+checkpoints/*.pth
+checkpoints/*.pt
+
+# Generated outputs (reproducible)
+results/*.json
+results/*.png
+results/*.csv
+gradcam_gallery/*.png
+gradcam_gallery/*.jpg
+omni_export/*.png
+omni_export/*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

@@ -1,8 +1,8 @@
 # VIPER Forensic Engine — Concurrency Execution Plan
 
 ## Directory Manifest
-- `data/cifake/` — Directory containing Kaggle CIFAKE dataset (60K real + 60K AI). Owned by: Data Agent.
-- `data/wikiart/` — Directory containing 1K WikiArt holdout dataset. Owned by: Data Agent.
+- `data/cifake/` — Directory containing Kaggle Ai Art vs Real Art dataset
+- `data/wikiart/` — Directory containing 1K WikiArt holdout dataset.
 - `src/dataloader.py` — Script for data ingestion, validation, and batching. Owned by: Data Agent.
 - `src/eda.py` — Script to compute the six required EDA metrics. Owned by: EDA Agent.
 - `results/feature_matrix.csv` — Matrix containing image paths and extracted EDA features. Owned by: EDA Agent.
