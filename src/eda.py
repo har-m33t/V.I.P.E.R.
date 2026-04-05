@@ -31,6 +31,11 @@ from skimage.feature import graycomatrix, graycoprops
 from skimage.restoration import denoise_wavelet
 from tqdm import tqdm
 
+try:
+    import torch
+except ImportError:
+    torch = None
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.config import (
     AI_ART_DIR, REAL_ART_DIR, WIKIART_DIR,
@@ -42,6 +47,7 @@ from src.config import (
 warnings.filterwarnings("ignore")
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+FEATURE_META_COLUMNS = {"image_path", "label"}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -349,6 +355,56 @@ def extract_features_from_rgb(
     features.update(glcm_features(img_rgb))
     features.update(edge_density(img_rgb))
     return features
+
+
+def build_standardized_feature_vector(
+    feature_row: Dict[str, float],
+    reference_df: Optional[pd.DataFrame] = None,
+    feature_columns: Optional[List[str]] = None,
+    as_tensor: bool = False,
+):
+    """
+    Standardize a forensic feature row against a reference feature matrix.
+
+    This is useful for late-fusion inference where the neural network expects
+    the same normalized feature ordering used during training.
+    """
+    if reference_df is None:
+        if not FEATURE_MATRIX_CSV.exists():
+            raise FileNotFoundError(
+                f"Reference feature matrix not found at {FEATURE_MATRIX_CSV}"
+            )
+        reference_df = pd.read_csv(FEATURE_MATRIX_CSV)
+
+    if reference_df.empty:
+        raise ValueError("Reference feature matrix is empty.")
+
+    feature_columns = feature_columns or [
+        column for column in reference_df.columns
+        if column not in FEATURE_META_COLUMNS
+    ]
+    if not feature_columns:
+        raise ValueError("Reference feature matrix does not contain feature columns.")
+
+    try:
+        vector = np.asarray(
+            [float(feature_row[column]) for column in feature_columns],
+            dtype=np.float32,
+        )
+    except KeyError as exc:
+        raise KeyError(f"Missing required feature column: {exc}") from exc
+
+    ref_matrix = reference_df[feature_columns].astype(np.float32)
+    mean = ref_matrix.mean(axis=0).to_numpy(dtype=np.float32)
+    std = ref_matrix.std(axis=0, ddof=0).to_numpy(dtype=np.float32)
+    std[std < 1e-6] = 1.0
+
+    standardized = (vector - mean) / std
+    if as_tensor:
+        if torch is None:
+            raise ImportError("torch is required when as_tensor=True.")
+        return torch.from_numpy(standardized)
+    return standardized
 
 
 # ─────────────────────────────────────────────────────────────────────────────
