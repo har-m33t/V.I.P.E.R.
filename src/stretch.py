@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import csv
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -31,9 +32,11 @@ from src.config import (
     BEST_MODEL_PATH,
     CLASS_NAMES,
     DEVICE,
+    FEATURE_MATRIX_CSV,
     IMAGE_SIZE,
     JPEG_QUALITY_LEVELS,
     JPEG_ROBUSTNESS_PNG,
+    OMNI_METADATA_CSV,
     SEED,
     STRETCH_SAMPLE_N,
     WIKIART_CONF_JSON,
@@ -50,6 +53,12 @@ WIKIART_REMBRANDT_QUERY = "rembrandt"
 SALT_PEPPER_NOISE_LEVELS = [0.0, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2]
 SALT_PEPPER_ROBUSTNESS_PNG = JPEG_ROBUSTNESS_PNG.with_name("salt_pepper_robustness.png")
 ROBUSTNESS_METRICS_JSON = JPEG_ROBUSTNESS_PNG.with_name("robustness_metrics.json")
+OMNI_METADATA_COLUMNS = [
+    "filename",
+    "boolean_label",
+    "model_confidence_score",
+    "top_extracted_feature_value",
+]
 
 
 def compress_jpeg(image_array: np.ndarray, quality: int) -> np.ndarray:
@@ -363,6 +372,143 @@ def _extract_wikiart_metadata(path: Path, source_root: Path) -> Dict[str, str]:
     }
 
 
+def _normalize_path_str(path_str: str) -> str:
+    """Normalize a filesystem path string for stable CSV joins."""
+    return str(Path(path_str).resolve(strict=False))
+
+
+def _safe_float(value: object) -> Optional[float]:
+    """Best-effort float parser returning None for non-numeric values."""
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    if np.isnan(parsed) or np.isinf(parsed):
+        return None
+    return parsed
+
+
+def _top_feature_value_from_row(row: Dict[str, str]) -> float:
+    """
+    Extract a single scalar summarizing the strongest forensic feature in a row.
+
+    The datathon export only requires the value, not the feature name, so this
+    uses the largest absolute numeric feature and returns its original value.
+    """
+    skip_cols = {"image_path", "label", "filename"}
+    best_value = 0.0
+    best_magnitude = -1.0
+
+    for key, raw_value in row.items():
+        if key in skip_cols:
+            continue
+        numeric_value = _safe_float(raw_value)
+        if numeric_value is None:
+            continue
+        magnitude = abs(numeric_value)
+        if magnitude > best_magnitude:
+            best_magnitude = magnitude
+            best_value = numeric_value
+
+    return float(best_value)
+
+
+def _load_feature_matrix_metadata(
+    feature_csv: Path = FEATURE_MATRIX_CSV,
+) -> Dict[str, Dict[str, object]]:
+    """Load feature-matrix metadata keyed by normalized image path."""
+    if not feature_csv.exists():
+        raise FileNotFoundError(f"Feature matrix not found: {feature_csv}")
+
+    metadata: Dict[str, Dict[str, object]] = {}
+    with feature_csv.open("r", newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            image_path = row.get("image_path")
+            if not image_path:
+                continue
+
+            normalized_path = _normalize_path_str(image_path)
+            label_value = _safe_float(row.get("label", "0"))
+            metadata[normalized_path] = {
+                "filename": Path(image_path).name,
+                "boolean_label": bool(int(label_value)) if label_value is not None else False,
+                "top_extracted_feature_value": _top_feature_value_from_row(row),
+            }
+
+    if not metadata:
+        raise RuntimeError(f"Feature matrix is empty or missing image paths: {feature_csv}")
+
+    return metadata
+
+
+@torch.no_grad()
+def export_omni_metadata(
+    model,
+    loaders: Sequence,
+    feature_csv: Path = FEATURE_MATRIX_CSV,
+    output_csv: Path = OMNI_METADATA_CSV,
+    device: torch.device = DEVICE,
+) -> Path:
+    """
+    Export the datathon-ready Omni CSV with exactly four required columns.
+
+    Columns:
+      - filename
+      - boolean_label
+      - model_confidence_score
+      - top_extracted_feature_value
+    """
+    feature_metadata = _load_feature_matrix_metadata(feature_csv)
+    transform = get_val_transform()
+    rows: List[Dict[str, object]] = []
+    seen_paths: set[str] = set()
+
+    model.eval()
+    for loader in loaders:
+        for _, _, paths in loader:
+            for image_path in paths:
+                normalized_path = _normalize_path_str(image_path)
+                if normalized_path in seen_paths:
+                    continue
+
+                seen_paths.add(normalized_path)
+                feature_row = feature_metadata.get(normalized_path)
+                if feature_row is None:
+                    continue
+
+                try:
+                    image = Image.open(image_path).convert("RGB")
+                    tensor = transform(image).unsqueeze(0).to(device)
+                    logits = model(tensor)
+                    confidence_score = float(F.softmax(logits, dim=1)[0, 1].item())
+                except Exception:
+                    continue
+
+                rows.append(
+                    {
+                        "filename": feature_row["filename"],
+                        "boolean_label": feature_row["boolean_label"],
+                        "model_confidence_score": confidence_score,
+                        "top_extracted_feature_value": feature_row["top_extracted_feature_value"],
+                    }
+                )
+
+    if not rows:
+        raise RuntimeError(
+            "Unable to assemble Omni metadata rows from the current dataloader and feature matrix."
+        )
+
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    with output_csv.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=OMNI_METADATA_COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"[StretchAgent] Exported Omni metadata -> {output_csv} ({len(rows)} rows)")
+    return output_csv
+
+
 def _summarize_probabilities(probabilities: Sequence[float]) -> Dict[str, float]:
     """Compute a compact confidence summary."""
     if not probabilities:
@@ -671,7 +817,7 @@ def run_stretch(checkpoint_path: Path = BEST_MODEL_PATH) -> None:
         print("[StretchAgent] No checkpoint found. Exiting.")
         return
 
-    _, _, test_loader = get_dataloaders(verbose=False)
+    train_loader, val_loader, test_loader = get_dataloaders(verbose=False)
     try:
         run_jpeg_robustness(model, test_loader, DEVICE)
     except ModuleNotFoundError as exc:
@@ -683,6 +829,10 @@ def run_stretch(checkpoint_path: Path = BEST_MODEL_PATH) -> None:
             "[StretchAgent] Skipping salt-and-pepper robustness because a dependency is missing: "
             f"{exc}"
         )
+    try:
+        export_omni_metadata(model, [train_loader, val_loader, test_loader], device=DEVICE)
+    except (FileNotFoundError, RuntimeError) as exc:
+        print(f"[StretchAgent] Skipping Omni metadata export: {exc}")
     run_wikiart_inference(model, device=DEVICE)
     print("[StretchAgent] All stretch goals complete.")
 
