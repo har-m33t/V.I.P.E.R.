@@ -313,6 +313,44 @@ def edge_density(img_rgb: np.ndarray) -> Dict[str, float]:
     }
 
 
+def load_image_rgb(
+    image_path: Path,
+    target_size: int = IMAGE_SIZE,
+) -> Optional[np.ndarray]:
+    """Load an image from disk, resize, and return an RGB array."""
+    img_bgr = cv2.imread(str(image_path))
+    if img_bgr is None:
+        return None
+    img_bgr = cv2.resize(img_bgr, (target_size, target_size))
+    return cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+
+def extract_features_from_rgb(
+    img_rgb: np.ndarray,
+    label: Optional[int] = None,
+    image_path: Optional[str] = None,
+) -> Dict[str, float]:
+    """
+    Compute the full forensic feature dictionary from an in-memory RGB image.
+
+    When `label` or `image_path` are provided, they are included so the result
+    can be written directly into the feature matrix schema.
+    """
+    features: Dict[str, float] = {}
+    if image_path is not None:
+        features["image_path"] = str(image_path)
+    if label is not None:
+        features["label"] = int(label)
+
+    features.update(compute_pixel_stats(img_rgb))
+    features.update(fft_analysis(img_rgb))
+    features.update(compute_color_entropy(img_rgb))
+    features.update(noise_residuals(img_rgb))
+    features.update(glcm_features(img_rgb))
+    features.update(edge_density(img_rgb))
+    return features
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Full Feature Extractor (all six families)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -334,22 +372,15 @@ def extract_all_features(
         Dict of all features + path + label, or None on failure.
     """
     try:
-        img_bgr = cv2.imread(str(image_path))
-        if img_bgr is None:
+        img_rgb = load_image_rgb(image_path, target_size=target_size)
+        if img_rgb is None:
             return None
-        img_bgr = cv2.resize(img_bgr, (target_size, target_size))
-        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-
-        features: Dict = {"image_path": str(image_path), "label": label}
-        features.update(compute_pixel_stats(img_rgb))
-        features.update(fft_analysis(img_rgb))
-        features.update(compute_color_entropy(img_rgb))
-        features.update(noise_residuals(img_rgb))
-        features.update(glcm_features(img_rgb))
-        features.update(edge_density(img_rgb))
-        return features
-
-    except Exception as e:
+        return extract_features_from_rgb(
+            img_rgb,
+            label=label,
+            image_path=str(image_path),
+        )
+    except Exception:
         return None
 
 
