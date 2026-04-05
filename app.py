@@ -7,11 +7,15 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, Optional
 
+import cv2
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 from PIL import Image
+
+from src.config import IMAGE_SIZE
 
 
 ROOT = Path(__file__).resolve().parent
@@ -28,25 +32,31 @@ EVAL_METRICS_JSON = RESULTS_DIR / "eval_metrics.json"
 DARK_CSS = """
 <style>
   :root {
-    --bg: #0b0c10;
-    --panel: #12171f;
-    --panel-soft: #1f2933;
-    --line: rgba(148, 163, 184, 0.14);
-    --text: #f3f4f6;
-    --muted: #9aa5b1;
-    --warn: #f59e0b;
-    --danger: #e11d48;
-    --safe: #10b981;
-    --shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+    --bg: #06080d;
+    --panel: #0f1419;
+    --panel-elevated: #151c26;
+    --panel-soft: #1a2330;
+    --line: rgba(148, 163, 184, 0.12);
+    --text: #e8eaef;
+    --muted: #8b95a8;
+    --gold: #c9a227;
+    --gold-dim: rgba(201, 162, 39, 0.35);
+    --electric: #2ec4ff;
+    --electric-dim: rgba(46, 196, 255, 0.22);
+    --risk: #e85d5d;
+    --risk-dim: rgba(232, 93, 93, 0.2);
+    --safe: #3ecf8e;
+    --shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
   }
   html, body, [class*="css"] {
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   }
   .stApp {
     background:
-      radial-gradient(circle at 0% 0%, rgba(225, 29, 72, 0.16), transparent 30%),
-      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.14), transparent 28%),
-      linear-gradient(135deg, #050608 0%, #0b0c10 50%, #11151b 100%);
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(46, 196, 255, 0.08), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(201, 162, 39, 0.06), transparent 50%),
+      radial-gradient(ellipse 50% 35% at 0% 80%, rgba(232, 93, 93, 0.05), transparent 45%),
+      linear-gradient(165deg, #030406 0%, #0a0e14 40%, #0d1219 100%);
     color: var(--text);
   }
   header[data-testid="stHeader"] {
@@ -60,8 +70,8 @@ DARK_CSS = """
     padding: 0.9rem 1.1rem 2rem;
   }
   section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, rgba(11, 12, 16, 0.98), rgba(17, 21, 27, 0.98));
-    border-right: 1px solid rgba(225, 29, 72, 0.16);
+    background: linear-gradient(180deg, rgba(6, 8, 13, 0.99), rgba(15, 20, 28, 0.98));
+    border-right: 1px solid rgba(46, 196, 255, 0.12);
   }
   section[data-testid="stSidebar"] > div {
     padding-top: 0.8rem;
@@ -72,65 +82,76 @@ DARK_CSS = """
   div[data-testid="stSidebar"] span {
     color: var(--text);
   }
-  .heist-header,
+  .ah-hero,
   .mission-shell,
   .artifact-shell,
   .section-shell,
   .scan-terminal,
-  .scan-sidecard {
+  .scan-sidecard,
+  .ah-panel {
     border: 1px solid var(--line);
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(18, 23, 31, 0.92), rgba(11, 12, 16, 0.96));
+    border-radius: 20px;
+    background: linear-gradient(145deg, rgba(21, 28, 38, 0.94), rgba(10, 13, 18, 0.97));
     box-shadow: var(--shadow);
   }
-  .heist-header {
-    padding: 1.2rem 1.25rem 1.15rem;
-    margin-bottom: 1.2rem;
+  .ah-hero {
+    padding: 1.35rem 1.4rem 1.3rem;
+    margin-bottom: 1.25rem;
     position: relative;
     overflow: hidden;
   }
-  .heist-header::before {
+  .ah-hero::before {
     content: "";
     position: absolute;
-    inset: auto -4rem -4rem auto;
-    width: 16rem;
-    height: 16rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(225, 29, 72, 0.22), transparent 60%);
+    inset: -40% -10% auto auto;
+    width: 55%;
+    height: 120%;
+    background: radial-gradient(ellipse, rgba(46, 196, 255, 0.09), transparent 65%);
     pointer-events: none;
   }
-  .heist-kicker {
-    color: var(--danger);
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    font-size: 0.72rem;
-    margin-bottom: 0.45rem;
+  .ah-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto auto -50% -15%;
+    width: 45%;
+    height: 100%;
+    background: radial-gradient(ellipse, rgba(201, 162, 39, 0.07), transparent 60%);
+    pointer-events: none;
   }
-  .heist-title-row {
+  .ah-kicker {
+    color: var(--electric);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.68rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  .ah-title-row {
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
     align-items: flex-start;
     justify-content: space-between;
+    position: relative;
+    z-index: 1;
   }
-  .heist-title {
+  .ah-title {
     margin: 0;
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    line-height: 0.95;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: clamp(1.65rem, 3.2vw, 2.65rem);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text);
   }
-  .heist-title span {
-    color: var(--danger);
-    display: block;
-    margin-top: 0.35rem;
+  .ah-title-gold {
+    color: var(--gold);
+    font-weight: 600;
   }
-  .heist-subtitle {
-    margin: 0.9rem 0 0;
-    max-width: 50rem;
+  .ah-subtitle {
+    margin: 0.75rem 0 0;
+    max-width: 46rem;
     color: var(--muted);
-    font-size: 0.98rem;
-    line-height: 1.6;
+    font-size: 0.95rem;
+    line-height: 1.65;
   }
   .status-grid {
     display: grid;
@@ -149,14 +170,14 @@ DARK_CSS = """
     background: rgba(31, 41, 51, 0.55);
   }
   .status-pill.danger {
-    border-color: rgba(225, 29, 72, 0.5);
-    color: #fecdd3;
-    background: linear-gradient(90deg, rgba(225, 29, 72, 0.22), rgba(225, 29, 72, 0.08));
+    border-color: var(--risk-dim);
+    color: #fecaca;
+    background: linear-gradient(90deg, var(--risk-dim), rgba(26, 31, 40, 0.6));
   }
   .status-pill.safe {
-    border-color: rgba(16, 185, 129, 0.5);
-    color: #d1fae5;
-    background: linear-gradient(90deg, rgba(16, 185, 129, 0.22), rgba(16, 185, 129, 0.08));
+    border-color: var(--gold-dim);
+    color: #f5e6b8;
+    background: linear-gradient(90deg, rgba(201, 162, 39, 0.18), rgba(26, 31, 40, 0.55));
   }
   .status-pill.neutral {
     border-color: rgba(148, 163, 184, 0.28);
@@ -177,10 +198,10 @@ DARK_CSS = """
   .mission-kicker,
   .section-kicker,
   .artifact-kicker {
-    color: var(--danger);
+    color: var(--electric);
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    font-size: 0.68rem;
   }
   .mission-copy,
   .section-copy,
@@ -217,34 +238,34 @@ DARK_CSS = """
   }
   div[data-testid="stSidebar"] div[role="radiogroup"] > label:has(input:checked),
   div[data-testid="stSidebar"] label[data-baseweb="radio"]:has(input:checked) {
-    border-color: rgba(225, 29, 72, 0.55);
-    background: linear-gradient(135deg, rgba(225, 29, 72, 0.18), rgba(31, 41, 51, 0.88));
-    box-shadow: 0 0 0 1px rgba(225, 29, 72, 0.18);
+    border-color: rgba(46, 196, 255, 0.45);
+    background: linear-gradient(135deg, var(--electric-dim), rgba(21, 28, 38, 0.9));
+    box-shadow: 0 0 0 1px rgba(46, 196, 255, 0.12);
   }
   div[data-testid="stSidebar"] div[role="radiogroup"] > label:hover,
   div[data-testid="stSidebar"] label[data-baseweb="radio"]:hover {
-    border-color: rgba(225, 29, 72, 0.34);
+    border-color: rgba(46, 196, 255, 0.28);
   }
   .scan-frame {
     position: relative;
     overflow: hidden;
-    border-radius: 24px;
-    border: 1px solid rgba(16, 185, 129, 0.26);
+    border-radius: 18px;
+    border: 1px solid rgba(201, 162, 39, 0.22);
     background:
-      linear-gradient(180deg, rgba(11, 12, 16, 0.22), rgba(11, 12, 16, 0.54)),
-      linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(31, 41, 51, 0.22));
+      linear-gradient(180deg, rgba(6, 8, 13, 0.35), rgba(10, 14, 20, 0.75)),
+      linear-gradient(135deg, var(--electric-dim), rgba(21, 28, 38, 0.15));
     box-shadow:
-      0 24px 80px rgba(0, 0, 0, 0.34),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      0 20px 70px rgba(0, 0, 0, 0.42),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.025);
   }
   .scan-frame::before {
     content: "";
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(16, 185, 129, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(16, 185, 129, 0.06) 1px, transparent 1px);
-    background-size: 26px 26px;
+      linear-gradient(rgba(46, 196, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(46, 196, 255, 0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
     pointer-events: none;
   }
   .scan-frame img {
@@ -257,17 +278,17 @@ DARK_CSS = """
   }
   .scan-frame-label {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
+    top: 0.85rem;
+    left: 0.85rem;
     z-index: 2;
-    padding: 0.35rem 0.65rem;
-    border-radius: 999px;
-    border: 1px solid rgba(16, 185, 129, 0.28);
-    background: rgba(11, 12, 16, 0.78);
-    color: #d1fae5;
-    font-size: 0.74rem;
+    padding: 0.32rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--gold-dim);
+    background: rgba(6, 8, 13, 0.88);
+    color: #f0e6c8;
+    font-size: 0.68rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
   .scan-frame-reticle {
@@ -278,11 +299,11 @@ DARK_CSS = """
   }
   .scan-frame-corner {
     position: absolute;
-    width: 40px;
-    height: 40px;
-    border-color: rgba(16, 185, 129, 0.7);
+    width: 36px;
+    height: 36px;
+    border-color: rgba(46, 196, 255, 0.45);
     border-style: solid;
-    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.22));
+    filter: drop-shadow(0 0 8px var(--electric-dim));
   }
   .scan-frame-corner.tl {
     top: 14px;
@@ -312,45 +333,104 @@ DARK_CSS = """
     position: absolute;
     left: 0;
     right: 0;
-    top: 14%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.85), transparent);
-    box-shadow: 0 0 18px rgba(16, 185, 129, 0.32);
-    animation: scanSweep 3.8s ease-in-out infinite;
+    top: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(46, 196, 255, 0.55), transparent);
+    box-shadow: 0 0 12px rgba(46, 196, 255, 0.2);
+    animation: scanSweep 5s ease-in-out infinite;
+    opacity: 0.85;
   }
   @keyframes scanSweep {
-    0%, 100% { transform: translateY(-20%); opacity: 0.15; }
-    50% { transform: translateY(320px); opacity: 0.92; }
+    0%, 100% { transform: translateY(-15%); opacity: 0.12; }
+    50% { transform: translateY(260px); opacity: 0.55; }
   }
-  .scan-banner {
-    margin: 1rem 0 0.75rem;
-    padding: 1rem 1.2rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    text-align: center;
-    font-family: "Courier New", monospace;
-    font-size: clamp(1.2rem, 2.6vw, 2rem);
-    font-weight: 700;
-    letter-spacing: 0.08em;
+  .ah-panel {
+    padding: 1rem 1.05rem;
+    margin-bottom: 0.85rem;
+  }
+  .ah-panel-kicker {
+    color: var(--muted);
     text-transform: uppercase;
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
-    animation: verdictPulse 1.8s ease-in-out infinite;
+    letter-spacing: 0.14em;
+    font-size: 0.65rem;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
   }
-  .scan-banner.authentic {
-    color: #d8ffe7;
-    background: linear-gradient(135deg, rgba(5, 74, 49, 0.94), rgba(13, 148, 88, 0.82));
-    border-color: rgba(74, 222, 128, 0.38);
-    text-shadow: 0 0 18px rgba(74, 222, 128, 0.26);
+  .ah-panel-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
   }
-  .scan-banner.forgery {
-    color: #ffe5eb;
-    background: linear-gradient(135deg, rgba(120, 18, 42, 0.94), rgba(225, 29, 72, 0.82));
-    border-color: rgba(251, 113, 133, 0.4);
-    text-shadow: 0 0 18px rgba(251, 113, 133, 0.24);
+  .ah-feedback {
+    margin-top: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(15, 20, 28, 0.65);
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--muted);
   }
-  @keyframes verdictPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3); }
-    50% { transform: scale(1.015); box-shadow: 0 22px 62px rgba(0, 0, 0, 0.4); }
+  .ah-score-line {
+    margin-top: 0.55rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .ah-verdict-chip {
+    display: inline-block;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.65rem;
+  }
+  .ah-verdict-chip.real {
+    border: 1px solid var(--gold-dim);
+    color: #f5e6b8;
+    background: rgba(201, 162, 39, 0.12);
+  }
+  .ah-verdict-chip.ai {
+    border: 1px solid var(--risk-dim);
+    color: #fecaca;
+    background: var(--risk-dim);
+  }
+  .ah-confidence-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    margin: 0.5rem 0 0.75rem;
+  }
+  .ah-confidence-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--electric), #5dd8ff);
+    transition: width 0.35s ease;
+  }
+  .ah-confidence-fill.ai-risk {
+    background: linear-gradient(90deg, #c94a4a, var(--risk));
+  }
+  div[class*="st-key-mark_authentic"] button {
+    border-color: var(--gold-dim) !important;
+    background: linear-gradient(95deg, rgba(201, 162, 39, 0.2), rgba(21, 28, 38, 0.95)) !important;
+    color: #f5f0e6 !important;
+  }
+  div[class*="st-key-mark_authentic"] button:hover {
+    border-color: rgba(201, 162, 39, 0.55) !important;
+    box-shadow: 0 0 20px rgba(201, 162, 39, 0.15) !important;
+  }
+  div[class*="st-key-mark_ai"] button {
+    border-color: var(--risk-dim) !important;
+    background: linear-gradient(95deg, var(--risk-dim), rgba(21, 28, 38, 0.95)) !important;
+    color: #fde8e8 !important;
+  }
+  div[class*="st-key-mark_ai"] button:hover {
+    border-color: rgba(232, 93, 93, 0.5) !important;
+    box-shadow: 0 0 18px rgba(232, 93, 93, 0.12) !important;
   }
   .scan-terminal {
     margin-bottom: 1rem;
@@ -363,22 +443,22 @@ DARK_CSS = """
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.65rem 0.9rem;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-    color: #fda4af;
-    font-size: 0.76rem;
-    letter-spacing: 0.14em;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--electric);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    font-family: Consolas, monospace;
-    background: rgba(255, 255, 255, 0.02);
+    font-family: "IBM Plex Mono", Consolas, monospace;
+    background: rgba(46, 196, 255, 0.04);
   }
   .scan-terminal-body {
     margin: 0;
-    padding: 1rem 1rem 1.05rem;
-    color: #d1fae5;
-    line-height: 1.65;
-    font-size: 0.98rem;
-    font-family: Consolas, monospace;
+    padding: 0.95rem 0.95rem 1rem;
+    color: #c8d0dc;
+    line-height: 1.6;
+    font-size: 0.9rem;
+    font-family: "IBM Plex Mono", Consolas, monospace;
     white-space: normal;
   }
   .scan-sidecard {
@@ -386,7 +466,7 @@ DARK_CSS = """
     margin-bottom: 1rem;
   }
   .scan-sidecard-label {
-    color: var(--danger);
+    color: var(--electric);
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-size: 0.76rem;
@@ -406,8 +486,8 @@ DARK_CSS = """
     overflow: hidden;
   }
   div[data-testid="stFileUploader"] {
-    background: rgba(18, 23, 31, 0.76);
-    border: 1px dashed rgba(225, 29, 72, 0.36);
+    background: rgba(15, 20, 28, 0.85);
+    border: 1px dashed rgba(46, 196, 255, 0.22);
     padding: 0.55rem;
   }
   div[data-testid="stFileUploaderDropzone"] {
@@ -417,21 +497,22 @@ DARK_CSS = """
   .stButton > button,
   button[kind="secondary"],
   button[kind="primary"] {
-    border-radius: 999px;
-    border: 1px solid rgba(225, 29, 72, 0.45);
-    background: linear-gradient(90deg, rgba(225, 29, 72, 0.18), rgba(31, 41, 51, 0.88));
+    border-radius: 10px;
+    border: 1px solid rgba(46, 196, 255, 0.25);
+    background: linear-gradient(95deg, rgba(46, 196, 255, 0.12), rgba(21, 28, 38, 0.92));
     color: var(--text);
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-weight: 700;
-    min-height: 2.7rem;
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25);
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    min-height: 2.55rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
   }
   div[data-testid="stFileUploaderDropzone"] button:hover,
   .stButton > button:hover,
   button[kind="secondary"]:hover,
   button[kind="primary"]:hover {
-    border-color: rgba(225, 29, 72, 0.68);
+    border-color: rgba(46, 196, 255, 0.45);
     color: #ffffff;
   }
   div[data-baseweb="select"] > div,
@@ -484,7 +565,7 @@ DARK_CSS = """
       padding-left: 0.75rem;
       padding-right: 0.75rem;
     }
-    .heist-title-row {
+    .ah-title-row {
       flex-direction: column;
     }
     .status-grid {
@@ -494,20 +575,21 @@ DARK_CSS = """
     }
   }
   @media (max-width: 640px) {
-    .heist-header,
+    .ah-hero,
     .mission-shell,
     .artifact-shell,
     .section-shell,
     .scan-terminal,
     .scan-sidecard,
-    .scan-frame {
-      border-radius: 18px;
+    .scan-frame,
+    .ah-panel {
+      border-radius: 16px;
     }
     .status-grid {
       grid-template-columns: 1fr;
     }
-    .heist-title {
-      font-size: 1.8rem;
+    .ah-title {
+      font-size: 1.45rem;
     }
   }
 </style>
@@ -655,21 +737,23 @@ def load_runtime() -> tuple[Optional[Any], Optional[str]]:
         return None, str(exc)
 
 
-def generate_gradcam_overlay(runtime: Any, image_bytes: bytes, predicted_index: int) -> tuple[Optional[np.ndarray], Optional[str]]:
+def generate_gradcam_views(
+    runtime: Any, image_bytes: bytes, predicted_index: int
+) -> tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
     try:
         from backend.app import (
             ClassifierOutputTarget,
             GradCAMPlusPlus,
             _FusionGradCAMWrapper,
         )
+        from matplotlib import cm as mpl_cm
         from src.config import IMAGE_SIZE
         from src.eda import extract_features_from_rgb
-        from src.visualize import overlay_heatmap
     except Exception as exc:
-        return None, f"Grad-CAM dependencies unavailable: {exc}"
+        return None, None, None, f"Grad-CAM dependencies unavailable: {exc}"
 
     if runtime.model is None or GradCAMPlusPlus is None or ClassifierOutputTarget is None:
-        return None, "Grad-CAM++ is unavailable in the current environment."
+        return None, None, None, "Grad-CAM++ is unavailable in the current environment."
 
     image = Image.open(BytesIO(image_bytes)).convert("RGB")
     resized_rgb = np.array(image.resize((IMAGE_SIZE, IMAGE_SIZE)), dtype=np.uint8)
@@ -690,23 +774,30 @@ def generate_gradcam_overlay(runtime: Any, image_bytes: bytes, predicted_index: 
         if callable(release):
             release()
 
-    return overlay_heatmap(resized_rgb, grayscale_cam), None
+    h, w = resized_rgb.shape[:2]
+    heatmap_resized = cv2.resize(grayscale_cam, (w, h))
+    heatmap_rgb = (mpl_cm.jet(heatmap_resized)[:, :, :3] * 255).astype(np.uint8)
+    alpha = 0.42
+    blended = (alpha * heatmap_rgb + (1.0 - alpha) * resized_rgb.astype(np.float32)).astype(np.uint8)
+    return resized_rgb, blended, heatmap_rgb, None
 
 
 @st.cache_data(show_spinner=False, max_entries=16)
-def analyze_uploaded_image(image_bytes: bytes, filename: str) -> tuple[dict[str, Any], Optional[np.ndarray], Optional[str]]:
+def analyze_uploaded_image(
+    image_bytes: bytes, filename: str
+) -> tuple[dict[str, Any], Optional[np.ndarray], Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
     runtime, runtime_error = load_runtime()
     if runtime is None:
-        return {}, None, runtime_error
+        return {}, None, None, None, runtime_error
 
     response = runtime.predict(image_bytes=image_bytes, filename=filename)
     response_dict = response.model_dump() if hasattr(response, "model_dump") else response.dict()
-    overlay, overlay_error = generate_gradcam_overlay(
+    original_rgb, blended, heatmap_rgb, overlay_error = generate_gradcam_views(
         runtime=runtime,
         image_bytes=image_bytes,
         predicted_index=int(response_dict["predicted_index"]),
     )
-    return response_dict, overlay, overlay_error
+    return response_dict, original_rgb, blended, heatmap_rgb, overlay_error
 
 
 def build_omni_explanation(report_card: dict[str, Any]) -> str:
@@ -721,12 +812,147 @@ def build_omni_explanation(report_card: dict[str, Any]) -> str:
     return str(report_card.get("verdict") or "VIPER completed the scan, but no narrative explanation is available.")
 
 
-def render_security_camera_feed(image_data_uri: str, filename: str) -> None:
+def prediction_reads_real(prediction: str) -> bool:
+    p = (prediction or "").strip().lower()
+    return "real" in p or "authentic" in p
+
+
+def build_forensic_blurb_from_evidence(result: dict[str, Any]) -> str:
+    elevated: list[str] = []
+    for raw in result.get("evidence_breakdown", []):
+        if not isinstance(raw, dict):
+            continue
+        sid = str(raw.get("id", "")).lower()
+        if sid not in {"fft", "prnu", "lab"}:
+            continue
+        status = str(raw.get("status", "")).lower()
+        if status in {"high", "medium", "moderate"}:
+            elevated.append(str(raw.get("label", sid)))
+
+    if len(elevated) >= 2:
+        return (
+            "Elevated " + ", ".join(elevated[:2]).lower()
+            + " suggest atypical frequency or color structure versus the trained corpus."
+        )
+    if len(elevated) == 1:
+        return f"Notable {elevated[0].lower()} relative to baseline reference statistics."
+    return (
+        "Frequency balance, residual noise, and chroma spread remain close to the corpus baseline "
+        "for this resolution."
+    )
+
+
+def compute_prnu_map_display(img_rgb: np.ndarray) -> np.ndarray:
+    gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    gray_norm = gray / 255.0
+    try:
+        from skimage.restoration import denoise_wavelet
+
+        denoised = denoise_wavelet(
+            gray_norm,
+            channel_axis=None,
+            method="BayesShrink",
+            mode="soft",
+            rescale_sigma=True,
+        ).astype(np.float32)
+    except ImportError:
+        denoised = cv2.GaussianBlur(gray_norm, (0, 0), sigmaX=1.0)
+    noise = gray_norm - denoised
+    prnu = noise / (gray_norm + 1e-3)
+    prnu = prnu - cv2.GaussianBlur(prnu, (3, 3), sigmaX=0.8)
+    z = (prnu - float(prnu.mean())) / max(float(prnu.std()), 1e-6)
+    z = np.clip(z / 3.0, -1.0, 1.0)
+    return ((z + 1.0) * 127.5).astype(np.uint8)
+
+
+def build_fft_spectrum_figure(img_rgb: np.ndarray) -> Any:
+    gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    fft = np.fft.fftshift(np.fft.fft2(gray))
+    mag = np.log(np.abs(fft) + 1e-8)
+    figure = px.imshow(
+        mag,
+        aspect="equal",
+        color_continuous_scale=[[0, "#0a1628"], [0.5, "#1e4976"], [1, "#2ec4ff"]],
+        title="",
+    )
+    apply_plot_theme(figure, height=200)
+    figure.update_layout(
+        margin=dict(l=0, r=0, t=8, b=0),
+        coloraxis_showscale=True,
+        coloraxis_colorbar=dict(len=0.75, thickness=12, tickfont=dict(size=9)),
+    )
+    figure.update_xaxes(showticklabels=False)
+    figure.update_yaxes(showticklabels=False)
+    return figure
+
+
+def build_prnu_map_figure(img_rgb: np.ndarray) -> Any:
+    prnu_u8 = compute_prnu_map_display(img_rgb)
+    figure = px.imshow(prnu_u8, aspect="equal", color_continuous_scale="gray")
+    apply_plot_theme(figure, height=200)
+    figure.update_layout(margin=dict(l=0, r=0, t=8, b=0), coloraxis_showscale=False)
+    figure.update_xaxes(showticklabels=False)
+    figure.update_yaxes(showticklabels=False)
+    return figure
+
+
+def build_lab_distribution_figure(img_rgb: np.ndarray) -> Any:
+    lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2LAB)
+    a_flat = lab[:, :, 1].flatten()
+    b_flat = lab[:, :, 2].flatten()
+    figure = go.Figure()
+    figure.add_trace(
+        go.Histogram(
+            x=a_flat,
+            name="a*",
+            nbinsx=40,
+            marker_color="rgba(46, 196, 255, 0.55)",
+        )
+    )
+    figure.add_trace(
+        go.Histogram(
+            x=b_flat,
+            name="b*",
+            nbinsx=40,
+            marker_color="rgba(201, 162, 39, 0.45)",
+        )
+    )
+    apply_plot_theme(figure, height=200)
+    figure.update_layout(
+        barmode="overlay",
+        bargap=0.02,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        margin=dict(l=8, r=8, t=28, b=8),
+    )
+    return figure
+
+
+def render_verdict_card(result: dict[str, Any], confidence_ratio: float, blurb: str) -> None:
+    model_real = prediction_reads_real(str(result.get("prediction", "")))
+    chip_class = "real" if model_real else "ai"
+    chip_text = "REAL" if model_real else "AI-GENERATED"
+    fill_class = "" if model_real else " ai-risk"
+    width_pct = max(3.0, min(100.0, confidence_ratio * 100.0))
+    st.markdown(
+        f"""
+        <div class="ah-panel">
+          <div class="ah-panel-kicker">Verdict</div>
+          <div class="ah-verdict-chip {chip_class}">Model prediction · {html.escape(chip_text)}</div>
+          <div class="ah-panel-title">Confidence {html.escape(str(result.get("confidence_pct", "")))}</div>
+          <div class="ah-confidence-bar"><div class="ah-confidence-fill{fill_class}" style="width:{width_pct:.1f}%"></div></div>
+          <p style="margin:0;color:var(--muted);font-size:0.88rem;line-height:1.55;">{html.escape(blurb)}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_current_piece_frame(image_data_uri: str, filename: str) -> None:
     safe_filename = html.escape(filename)
     st.markdown(
         f"""
         <div class="scan-frame">
-          <div class="scan-frame-label">Security Camera Feed</div>
+          <div class="scan-frame-label">Current Piece</div>
           <img src="{image_data_uri}" alt="{safe_filename}" />
           <div class="scan-frame-reticle" aria-hidden="true">
             <span class="scan-frame-corner tl"></span>
@@ -741,28 +967,13 @@ def render_security_camera_feed(image_data_uri: str, filename: str) -> None:
     )
 
 
-def render_scan_banner(prediction: str) -> None:
-    normalized = prediction.strip().lower()
-    is_authentic = "real" in normalized or "authentic" in normalized
-    banner_text = (
-        "[ AUTHENTIC: INITIATE HEIST ]"
-        if is_authentic
-        else "[ FORGERY DETECTED: ABORT MISSION ]"
-    )
-    banner_class = "authentic" if is_authentic else "forgery"
-    st.markdown(
-        f'<div class="scan-banner {banner_class}">{html.escape(banner_text)}</div>',
-        unsafe_allow_html=True,
-    )
-
-
 def render_terminal_explainer(explanation: str) -> None:
     st.markdown(
         f"""
         <div class="scan-terminal">
           <div class="scan-terminal-header">
-            <span>Omni Lite Explainer</span>
-            <span>Retinal Scan Summary</span>
+            <span>System Insight</span>
+            <span>Analysis log</span>
           </div>
           <p class="scan-terminal-body">{html.escape(explanation)}</p>
         </div>
@@ -805,21 +1016,20 @@ def apply_plot_theme(figure: Any, height: Optional[int] = None) -> Any:
 def render_banner() -> None:
     st.markdown(
         """
-        <section class="heist-header">
-          <div class="heist-kicker">Mission Control</div>
-          <div class="heist-title-row">
+        <section class="ah-hero">
+          <div class="ah-kicker">Museum vault · forensic channel</div>
+          <div class="ah-title-row">
             <div>
-              <h1 class="heist-title">VIPER TERMINAL <span>// OPERATION: ARTHEIST</span></h1>
-              <p class="heist-subtitle">
-                Live artwork scans, cached validation optics, and judge-safe evidence review in one
-                dark heist deck. The backend stays intact while the terminal look shifts fully into
-                the mission theme.
+              <h1 class="ah-title">ArtHeist: <span class="ah-title-gold">Forensic Intelligence System</span></h1>
+              <p class="ah-subtitle">
+                Classify artwork as real or AI-generated with fusion-model verdicts, Grad-CAM evidence,
+                and validation intelligence—presented as a secure lab console with light analyst decisions.
               </p>
             </div>
             <div class="status-grid">
-              <div class="status-pill danger">Forgery Alert Grid</div>
-              <div class="status-pill safe">Authenticity Gate Armed</div>
-              <div class="status-pill neutral">Cached Runtime Locked</div>
+              <div class="status-pill safe">Authentic · gold track</div>
+              <div class="status-pill danger">AI / risk channel</div>
+              <div class="status-pill neutral">Analysis · electric trace</div>
             </div>
           </div>
         </section>
@@ -832,19 +1042,19 @@ def render_sidebar() -> str:
     st.sidebar.markdown(
         """
         <section class="mission-shell">
-          <div class="mission-kicker">Mission Briefing</div>
-          <div class="mission-title">Choose the active surface.</div>
+          <div class="mission-kicker">Navigation</div>
+          <div class="mission-title">Workspace</div>
           <p class="mission-copy">
-            The Target runs the live artwork scan. Forensic Optics stays locked to validation artifacts
-            so the evidence deck remains clean and demo-safe.
+            Inspect a piece under the vault lamp, then open the intelligence deck for latent space,
+            confidence, and error analytics from cached validation runs.
           </p>
         </section>
         """,
         unsafe_allow_html=True,
     )
     view = st.sidebar.radio(
-        "Mission Surface",
-        options=("The Target (Scan)", "Forensic Optics (VIPER Data)"),
+        "Workspace",
+        options=("Artwork Inspection", "Model Intelligence Dashboard"),
         index=0,
         label_visibility="collapsed",
     )
@@ -912,6 +1122,46 @@ def render_signal_buckets(result: dict[str, Any]) -> None:
             )
             detail = str(signal.get("value") or signal.get("detail") or config["fallback"])
             st.caption(detail)
+
+
+def build_model_performance_triple_figure(
+    eval_metrics: dict[str, Any],
+    baseline_metrics: dict[str, Any],
+) -> Optional[Any]:
+    rows: list[dict[str, Any]] = []
+    b_f1 = baseline_metrics.get("f1")
+    v_f1 = eval_metrics.get("f1")
+    t_f1 = eval_metrics.get("test_f1")
+    if b_f1 is not None:
+        rows.append({"stage": "Baseline", "F1": float(b_f1)})
+    if v_f1 is not None:
+        rows.append({"stage": "Improved (validation)", "F1": float(v_f1)})
+    if t_f1 is not None:
+        rows.append({"stage": "Final (held-out test)", "F1": float(t_f1)})
+    if len(rows) < 2:
+        return None
+    frame = pd.DataFrame(rows)
+    frame["label"] = frame["F1"].map(lambda v: f"{v:.1%}")
+    figure = px.bar(
+        frame,
+        x="stage",
+        y="F1",
+        text="label",
+        title="Model performance · F1 progression",
+        template="plotly_dark",
+        color="stage",
+        color_discrete_map={
+            "Baseline": "#64748b",
+            "Improved (validation)": "#2ec4ff",
+            "Final (held-out test)": "#c9a227",
+        },
+    )
+    apply_plot_theme(figure, height=380)
+    figure.update_traces(textposition="outside", cliponaxis=False)
+    figure.update_layout(showlegend=False)
+    figure.update_yaxes(range=[0, 1.08], tickformat=".0%", showgrid=True, gridcolor="rgba(148, 163, 184, 0.10)", zeroline=False)
+    figure.update_xaxes(showgrid=False)
+    return figure
 
 
 def build_fast_track_comparison_figure(
@@ -1002,103 +1252,210 @@ def render_metrics_strip(eval_metrics: dict[str, Any], baseline_metrics: dict[st
 
 def render_image_forensics() -> None:
     render_section_intro(
-        "The Target",
-        "Live scan a suspect artwork through the VIPER stack.",
-        "Upload a painting or inspect a cached breach overlay. The inference runtime stays hot, so navigation and repeat scans do not trigger a cold model reload.",
+        "Inspection bay",
+        "Artwork under the vault lamp.",
+        "Upload a piece to run the fusion classifier, compare your judgment with the model, and review Grad-CAM plus lightweight forensic plots. Cached gallery samples remain available for overlay reference.",
     )
 
     uploader_col, gallery_col = st.columns([1.25, 0.75])
     with uploader_col:
         uploaded_file = st.file_uploader(
-            "Upload the target artwork",
+            "Secure intake",
             type=["jpg", "jpeg", "png", "webp", "bmp"],
             accept_multiple_files=False,
+            help="JPEG / PNG / WebP — routed through the VIPER runtime.",
         )
     with gallery_col:
         sample_names = list_gradcam_samples(str(GRADCAM_DIR), _mtime(GRADCAM_DIR))
         sample_choice = st.selectbox(
-            "Vaulted overlay archive",
+            "Grad-CAM gallery (reference)",
             options=["None"] + sample_names,
             index=0,
         )
 
+    if "ah_matches" not in st.session_state:
+        st.session_state.ah_matches = 0
+    if "ah_decisions" not in st.session_state:
+        st.session_state.ah_decisions = 0
+    if "ah_feedback" not in st.session_state:
+        st.session_state.ah_feedback = ""
+
     runtime, runtime_error = load_runtime()
     if runtime_error:
-        st.info(f"Live scan runtime unavailable: {runtime_error}")
+        st.info(f"Live inference unavailable: {runtime_error}")
 
     if uploaded_file is not None:
         image_bytes = uploaded_file.getvalue()
         image_data_uri = build_png_data_uri(image_bytes)
-        with st.spinner("Running cached VIPER inference..."):
-            result, overlay, overlay_error = analyze_uploaded_image(image_bytes, uploaded_file.name)
+        with st.spinner("Running forensic inference…"):
+            result, orig_rgb, blended, heatmap_rgb, gradcam_error = analyze_uploaded_image(
+                image_bytes, uploaded_file.name
+            )
 
         if not result:
-            st.error(overlay_error or "Inference failed.")
+            st.error(gradcam_error or "Inference failed.")
             return
 
-        explanation = build_omni_explanation(result)
-
-        scan_cols = st.columns(2)
-        with scan_cols[0]:
-            st.markdown("**Security Feed**")
-            render_security_camera_feed(image_data_uri=image_data_uri, filename=uploaded_file.name)
-        with scan_cols[1]:
-            st.markdown("**Thermal Trace**")
-            if overlay is not None:
-                st.image(overlay, use_container_width=True)
-            else:
-                st.warning(overlay_error or "Grad-CAM overlay unavailable.")
-
-        render_scan_banner(result["prediction"])
-
-        verdict_cols = st.columns(4)
-        verdict_cols[0].metric("Classification", result["prediction"])
-        verdict_cols[1].metric("Confidence Lock", result["confidence_pct"])
-        verdict_cols[2].metric("Forgery Probability", f"{float(result['ai_probability']):.1%}")
-        verdict_cols[3].metric("Fusion Stack", "EDA On" if result["uses_eda_fusion"] else "Image Only")
-
-        render_terminal_explainer(explanation)
-
-        st.markdown('<div class="signal-label">Signal Buckets</div>', unsafe_allow_html=True)
-        render_signal_buckets(result)
-
-        gradcam_item = _signal_items(result).get("gradcam")
-        if gradcam_item is not None:
-            st.caption(
-                f"Grad-CAM focus: {gradcam_item.get('detail', 'Attention trace unavailable.')} "
-                f"({gradcam_item.get('value', 'No coverage summary')})"
-            )
-
-        with st.expander("Signal Trace", expanded=False):
-            evidence_df = pd.DataFrame(result["evidence_breakdown"])
-            if not evidence_df.empty:
-                st.dataframe(
-                    evidence_df[["label", "status", "score", "value", "detail"]],
-                    use_container_width=True,
-                    hide_index=True,
+        forensic_rgb = orig_rgb
+        if forensic_rgb is None:
+            try:
+                forensic_rgb = np.array(
+                    Image.open(BytesIO(image_bytes))
+                    .convert("RGB")
+                    .resize((IMAGE_SIZE, IMAGE_SIZE), Image.Resampling.LANCZOS),
+                    dtype=np.uint8,
                 )
-            st.write(
-                "Evidence signals are reused from the backend runtime so toggling views does not rerun "
-                "model loading or image-level feature extraction for the same upload."
+            except Exception:
+                forensic_rgb = np.zeros((64, 64, 3), dtype=np.uint8)
+
+        explanation = build_omni_explanation(result)
+        blurb = build_forensic_blurb_from_evidence(result)
+        conf_ratio = float(result.get("confidence_score", 0.0))
+
+        left, center, right = st.columns([0.22, 0.38, 0.40])
+
+        with left:
+            st.markdown(
+                """
+                <div class="ah-panel">
+                  <div class="ah-panel-kicker">Analyst decision</div>
+                  <div class="ah-panel-title">Your call</div>
+                  <p style="margin:0.5rem 0 0;font-size:0.82rem;color:var(--muted);line-height:1.5;">
+                    Record judgment against the model. Score tracks agreement only (not ground truth).
+                  </p>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
-            st.json(
-                {
-                    "filename": result["filename"],
-                    "model_name": result["model_name"],
-                    "gradcam_available": result["gradcam_available"],
-                }
+            st.markdown("")
+            model_real = prediction_reads_real(str(result["prediction"]))
+            if st.button("Mark as Authentic", key="mark_authentic", use_container_width=True):
+                st.session_state.ah_decisions += 1
+                if model_real:
+                    st.session_state.ah_matches += 1
+                    st.session_state.ah_feedback = (
+                        "Aligned — your assessment matches the model: authentic artwork."
+                    )
+                else:
+                    st.session_state.ah_feedback = (
+                        "Disagreement — the model classifies this as AI-generated."
+                    )
+            if st.button("Flag as AI-Generated", key="mark_ai", use_container_width=True):
+                st.session_state.ah_decisions += 1
+                if not model_real:
+                    st.session_state.ah_matches += 1
+                    st.session_state.ah_feedback = (
+                        "Aligned — your assessment matches the model: AI-generated."
+                    )
+                else:
+                    st.session_state.ah_feedback = (
+                        "Disagreement — the model reads this as authentic artwork."
+                    )
+
+            if st.session_state.ah_feedback:
+                st.markdown(
+                    f'<div class="ah-feedback">{html.escape(st.session_state.ah_feedback)}</div>',
+                    unsafe_allow_html=True,
+                )
+            total_d = int(st.session_state.ah_decisions)
+            matches = int(st.session_state.ah_matches)
+            st.markdown(
+                f'<p class="ah-score-line">Correct identifications (vs model): {matches} / {total_d}</p>',
+                unsafe_allow_html=True,
             )
+
+        with center:
+            st.markdown(
+                '<div class="ah-panel-kicker" style="margin-bottom:0.35rem;">Exhibit display</div>',
+                unsafe_allow_html=True,
+            )
+            render_current_piece_frame(image_data_uri=image_data_uri, filename=uploaded_file.name)
+
+        with right:
+            render_verdict_card(result, conf_ratio, blurb)
+            st.markdown(
+                '<div class="ah-panel-kicker" style="margin:0.85rem 0 0.35rem;">Visual evidence · Grad-CAM</div>',
+                unsafe_allow_html=True,
+            )
+            view_mode = st.radio(
+                "View",
+                ("Original", "Heatmap", "Blended"),
+                horizontal=True,
+                label_visibility="collapsed",
+            )
+            display_img: Optional[np.ndarray] = None
+            if view_mode == "Original" and orig_rgb is not None:
+                display_img = orig_rgb
+            elif view_mode == "Heatmap" and heatmap_rgb is not None:
+                display_img = heatmap_rgb
+            elif view_mode == "Blended" and blended is not None:
+                display_img = blended
+            if display_img is not None:
+                st.image(display_img, use_container_width=True)
+            else:
+                st.warning(gradcam_error or "Grad-CAM views unavailable.")
+
+            gradcam_item = _signal_items(result).get("gradcam")
+            if gradcam_item is not None:
+                st.caption(
+                    f"{gradcam_item.get('detail', '')} · {gradcam_item.get('value', '')}"
+                )
+
+            mini = st.columns(4)
+            mini[0].metric("P(real)", f"{1.0 - float(result['ai_probability']):.1%}")
+            mini[1].metric("P(AI)", f"{float(result['ai_probability']):.1%}")
+            mini[2].metric("Fusion", "On" if result["uses_eda_fusion"] else "Img")
+            mini[3].metric("CAM", "OK" if result["gradcam_available"] else "—")
+
+            st.markdown(
+                '<div class="ah-panel-kicker" style="margin:0.85rem 0 0.5rem;">Forensic signals</div>',
+                unsafe_allow_html=True,
+            )
+            with st.expander("FFT spectrum · frequency domain", expanded=False):
+                st.caption("Log-magnitude spectrum; irregular high-frequency energy can indicate synthesis artifacts.")
+                st.plotly_chart(build_fft_spectrum_figure(forensic_rgb), use_container_width=True)
+            with st.expander("PRNU noise map · residual field", expanded=False):
+                st.caption("Wavelet residual emphasis; camera-like vs synthetic noise structure.")
+                st.plotly_chart(build_prnu_map_figure(forensic_rgb), use_container_width=True)
+            with st.expander("LAB color distribution", expanded=False):
+                st.caption("a* / b* histograms in LAB space for chroma spread.")
+                st.plotly_chart(build_lab_distribution_figure(forensic_rgb), use_container_width=True)
+
+            st.markdown('<div class="signal-label">Signal scores</div>', unsafe_allow_html=True)
+            render_signal_buckets(result)
+
+            render_terminal_explainer(explanation)
+
+            with st.expander("Raw evidence table", expanded=False):
+                evidence_df = pd.DataFrame(result["evidence_breakdown"])
+                if not evidence_df.empty:
+                    st.dataframe(
+                        evidence_df[["label", "status", "score", "value", "detail"]],
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+                st.json(
+                    {
+                        "filename": result["filename"],
+                        "model_name": result["model_name"],
+                        "gradcam_available": result["gradcam_available"],
+                    }
+                )
     elif sample_choice != "None":
         st.image(
             str(GRADCAM_DIR / sample_choice),
-            caption=f"Vault archive sample: {sample_choice}",
+            caption=f"Gallery reference: {sample_choice}",
             use_container_width=True,
         )
     else:
-        st.info("Upload a target or inspect a cached overlay from the archive.")
+        st.info("Upload artwork for a full inspection, or pick a gallery overlay for a quick visual reference.")
 
 
-def build_umap_figure(projection_df: pd.DataFrame, only_errors: bool) -> Any:
+def build_umap_figure(
+    projection_df: pd.DataFrame,
+    only_errors: bool,
+    color_mode: str,
+) -> Any:
     filtered_df = projection_df.copy()
     if only_errors:
         filtered_df = filtered_df[filtered_df["error_type"] != "correct"]
@@ -1107,37 +1464,64 @@ def build_umap_figure(projection_df: pd.DataFrame, only_errors: bool) -> Any:
         return None
 
     filtered_df["marker_group"] = filtered_df["error_type"].str.replace("_", " ").str.title()
-    figure = px.scatter(
-        filtered_df,
-        x="umap_x",
-        y="umap_y",
-        color="predicted_confidence",
-        color_continuous_scale=["#1f2933", "#334155", "#10b981", "#f59e0b", "#e11d48"],
-        symbol="marker_group",
-        hover_name="filename",
-        hover_data={
-            "label_name": True,
-            "predicted_name": True,
-            "predicted_confidence": ":.1%",
-            "ai_probability": ":.1%",
-            "error_type": True,
-            "umap_x": ":.3f",
-            "umap_y": ":.3f",
-        },
-        title="Forensic Optics vault map colored by prediction confidence",
-        labels={
-            "umap_x": "Projection X",
-            "umap_y": "Projection Y",
-            "predicted_confidence": "Confidence",
-            "marker_group": "Outcome",
-        },
-        template="plotly_dark",
-    )
-    figure.update_traces(marker={"size": 9, "line": {"width": 0.6, "color": "rgba(255,255,255,0.15)"}})
-    figure.update_xaxes(showgrid=True, gridcolor="rgba(148, 163, 184, 0.10)", zeroline=False)
-    figure.update_yaxes(showgrid=True, gridcolor="rgba(148, 163, 184, 0.10)", zeroline=False)
-    figure.update_layout(coloraxis_colorbar_title="Confidence", legend_title_text="Outcome")
-    return apply_plot_theme(figure, height=620)
+    hover_data = {
+        "label_name": True,
+        "predicted_name": True,
+        "predicted_confidence": ":.1%",
+        "ai_probability": ":.1%",
+        "error_type": True,
+        "umap_x": ":.3f",
+        "umap_y": ":.3f",
+    }
+
+    if color_mode == "truth" and "label_name" in filtered_df.columns:
+        figure = px.scatter(
+            filtered_df,
+            x="umap_x",
+            y="umap_y",
+            color="label_name",
+            symbol="marker_group",
+            hover_name="filename",
+            hover_data=hover_data,
+            title="Latent space map · true label (validation)",
+            labels={
+                "umap_x": "UMAP-1",
+                "umap_y": "UMAP-2",
+                "label_name": "True class",
+                "marker_group": "Outcome",
+            },
+            template="plotly_dark",
+            color_discrete_map={
+                "REAL": "#c9a227",
+                "AI_GENERATED": "#e85d5d",
+            },
+        )
+        figure.update_layout(legend_title_text="True label")
+    else:
+        figure = px.scatter(
+            filtered_df,
+            x="umap_x",
+            y="umap_y",
+            color="predicted_confidence",
+            color_continuous_scale=["#0a1628", "#1e4976", "#2ec4ff", "#c9a227", "#e85d5d"],
+            symbol="marker_group",
+            hover_name="filename",
+            hover_data=hover_data,
+            title="Latent space map · model confidence",
+            labels={
+                "umap_x": "UMAP-1",
+                "umap_y": "UMAP-2",
+                "predicted_confidence": "Confidence",
+                "marker_group": "Outcome",
+            },
+            template="plotly_dark",
+        )
+        figure.update_layout(coloraxis_colorbar_title="Confidence", legend_title_text="Outcome")
+
+    figure.update_traces(marker={"size": 9, "line": {"width": 0.5, "color": "rgba(255,255,255,0.12)"}})
+    figure.update_xaxes(showgrid=True, gridcolor="rgba(148, 163, 184, 0.08)", zeroline=False)
+    figure.update_yaxes(showgrid=True, gridcolor="rgba(148, 163, 184, 0.08)", zeroline=False)
+    return apply_plot_theme(figure, height=560)
 
 
 def render_forensic_optics() -> None:
@@ -1157,9 +1541,9 @@ def render_forensic_optics() -> None:
     )
 
     render_section_intro(
-        "Forensic Optics",
-        "Inspect the cached validation vault behind the live scan.",
-        "This surface stays locked to validation-only artifacts, giving the judges the model's confidence landscape and edge-case behavior without touching the training split.",
+        "Model intelligence",
+        "Validation-only intelligence deck.",
+        "UMAP projections, confidence coloring, F1 progression, and error taxonomies are computed from cached validation predictions—no training leakage.",
     )
 
     if projection_df.empty:
@@ -1170,77 +1554,113 @@ def render_forensic_optics() -> None:
 
     render_metrics_strip(eval_metrics, baseline_metrics, summary)
 
-    toggle_col, count_col = st.columns([0.7, 0.3])
-    with toggle_col:
-        only_errors = st.toggle("Isolate misclassified edge cases", value=False)
-    with count_col:
-        st.metric("Edge Cases", f"{len(errors_df)}", "Validation misses")
+    st.markdown(
+        """
+        <div class="ah-panel-kicker" style="margin:1rem 0 0.35rem;">Latent space map</div>
+        <p style="margin:0 0 0.75rem;color:var(--muted);font-size:0.9rem;max-width:52rem;">
+          Two-dimensional embedding of validation embeddings. Toggle coloring to separate true Real vs AI clusters
+          or inspect certainty via continuous confidence.
+        </p>
+        """,
+        unsafe_allow_html=True,
+    )
+    ctrl1, ctrl2, ctrl3 = st.columns([0.42, 0.28, 0.3])
+    with ctrl1:
+        color_mode = st.radio(
+            "Color by",
+            options=("truth", "confidence"),
+            format_func=lambda m: "True label (REAL / AI)" if m == "truth" else "Model confidence",
+            horizontal=True,
+            label_visibility="visible",
+        )
+    with ctrl2:
+        only_errors = st.toggle("Misclassified only", value=False)
+    with ctrl3:
+        st.metric("Edge cases in validation", f"{len(errors_df)}")
 
-    umap_figure = build_umap_figure(projection_df, only_errors=only_errors)
+    umap_figure = build_umap_figure(
+        projection_df,
+        only_errors=only_errors,
+        color_mode=str(color_mode),
+    )
     if umap_figure is not None:
         st.plotly_chart(umap_figure, use_container_width=True)
 
-    with st.expander("Open Mission Telemetry", expanded=False):
+    st.markdown(
+        '<div class="ah-panel-kicker" style="margin:1rem 0 0.35rem;">Model performance</div>',
+        unsafe_allow_html=True,
+    )
+    perf_row = st.columns(2)
+    with perf_row[0]:
+        triple_fig = build_model_performance_triple_figure(eval_metrics, baseline_metrics)
+        if triple_fig is not None:
+            st.plotly_chart(triple_fig, use_container_width=True)
+    with perf_row[1]:
         comparison_figure = build_fast_track_comparison_figure(eval_metrics, baseline_metrics)
         if comparison_figure is not None:
             st.plotly_chart(comparison_figure, use_container_width=True)
 
-        if not breakdown_df.empty:
-            chart_cols = st.columns(2)
-            with chart_cols[0]:
-                bar_figure = px.bar(
-                    breakdown_df,
-                    x="error_type",
-                    y="count",
-                    color="confidence_bucket",
-                    barmode="group",
-                    text="count",
-                    title="Error breakdown by confidence bucket",
-                    labels={
-                        "error_type": "Failure mode",
-                        "count": "Images",
-                        "confidence_bucket": "Confidence",
-                    },
-                    template="plotly_dark",
-                    color_discrete_map={"high": "#e11d48", "medium": "#f59e0b", "low": "#10b981"},
-                )
-                apply_plot_theme(bar_figure, height=420)
-                bar_figure.update_xaxes(showgrid=False)
-                bar_figure.update_yaxes(showgrid=True, gridcolor="rgba(148, 163, 184, 0.10)", zeroline=False)
-                st.plotly_chart(bar_figure, use_container_width=True)
-            with chart_cols[1]:
-                pie_figure = px.pie(
-                    breakdown_df,
-                    names="failure_mode",
-                    values="count",
-                    title="Share of validation errors",
-                    template="plotly_dark",
-                    hole=0.5,
-                    color="confidence_bucket",
-                    color_discrete_map={"high": "#e11d48", "medium": "#f59e0b", "low": "#10b981"},
-                )
-                apply_plot_theme(pie_figure, height=420)
-                st.plotly_chart(pie_figure, use_container_width=True)
-        else:
-            st.success("No validation misses found in the current artifact set.")
-
-        if not errors_df.empty:
-            st.markdown("**Highest-confidence misses**")
-            st.dataframe(
-                errors_df.sort_values("predicted_confidence", ascending=False).head(12)[
-                    [
-                        "filename",
-                        "label_name",
-                        "predicted_name",
-                        "predicted_confidence",
-                        "confidence_bucket",
-                        "error_type",
-                    ]
-                ],
-                use_container_width=True,
-                hide_index=True,
+    st.markdown(
+        '<div class="ah-panel-kicker" style="margin:1rem 0 0.35rem;">Error analysis</div>',
+        unsafe_allow_html=True,
+    )
+    if not breakdown_df.empty:
+        chart_cols = st.columns(2)
+        with chart_cols[0]:
+            bar_figure = px.bar(
+                breakdown_df,
+                x="error_type",
+                y="count",
+                color="confidence_bucket",
+                barmode="group",
+                text="count",
+                title="Misclassifications by confidence bucket",
+                labels={
+                    "error_type": "Failure mode",
+                    "count": "Images",
+                    "confidence_bucket": "Confidence",
+                },
+                template="plotly_dark",
+                color_discrete_map={"high": "#e85d5d", "medium": "#c9a227", "low": "#2ec4ff"},
             )
+            apply_plot_theme(bar_figure, height=400)
+            bar_figure.update_xaxes(showgrid=False)
+            bar_figure.update_yaxes(showgrid=True, gridcolor="rgba(148, 163, 184, 0.10)", zeroline=False)
+            st.plotly_chart(bar_figure, use_container_width=True)
+        with chart_cols[1]:
+            pie_figure = px.pie(
+                breakdown_df,
+                names="failure_mode",
+                values="count",
+                title="Share of failure modes",
+                template="plotly_dark",
+                hole=0.52,
+                color="confidence_bucket",
+                color_discrete_map={"high": "#e85d5d", "medium": "#c9a227", "low": "#2ec4ff"},
+            )
+            apply_plot_theme(pie_figure, height=400)
+            st.plotly_chart(pie_figure, use_container_width=True)
+    else:
+        st.success("No validation misses in the current artifact set.")
 
+    if not errors_df.empty:
+        st.markdown("**Highest-confidence misses**")
+        st.dataframe(
+            errors_df.sort_values("predicted_confidence", ascending=False).head(12)[
+                [
+                    "filename",
+                    "label_name",
+                    "predicted_name",
+                    "predicted_confidence",
+                    "confidence_bucket",
+                    "error_type",
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    with st.expander("Telemetry JSON", expanded=False):
         st.json(
             {
                 "split": summary.get("split", "validation"),
@@ -1253,7 +1673,7 @@ def render_forensic_optics() -> None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="VIPER TERMINAL",
+        page_title="ArtHeist · Forensic Intelligence",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -1261,7 +1681,7 @@ def main() -> None:
     render_banner()
     view = render_sidebar()
 
-    if view == "The Target (Scan)":
+    if view == "Artwork Inspection":
         render_image_forensics()
     else:
         render_forensic_optics()
