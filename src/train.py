@@ -17,11 +17,10 @@ import sys
 import json
 import time
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
@@ -31,18 +30,13 @@ from tqdm import tqdm
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.config import (
     DEVICE, NUM_EPOCHS, LEARNING_RATE, BEST_MODEL_PATH,
-    RESULTS_DIR, SEED, BATCH_SIZE, UNFREEZE_BLOCKS,
+    RESULTS_DIR, SEED, BATCH_SIZE,
 )
 from src.dataloader import get_dataloaders
 from src.model import build_model, VIPERClassifier
 
 import random
 import numpy as np
-
-HEAD_ONLY_EPOCHS = 3
-BACKBONE_LR_DIVISOR = 10.0
-FOCAL_GAMMA = 2.0
-FOCAL_ALPHA = None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -56,103 +50,6 @@ def set_seed(seed: int = SEED) -> None:
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
-
-
-def configure_training_stage(
-    model: VIPERClassifier,
-    unfreeze_blocks: int,
-) -> None:
-    """
-    Freeze the EfficientNet backbone, then optionally unfreeze the last
-    n MBConv blocks while always keeping the classifier head trainable.
-    """
-    for param in model.backbone.features.parameters():
-        param.requires_grad = False
-
-    for param in model.backbone.classifier.parameters():
-        param.requires_grad = True
-
-    if unfreeze_blocks <= 0:
-        return
-
-    feature_layers = list(model.backbone.features.children())
-    for layer in feature_layers[-unfreeze_blocks:]:
-        for param in layer.parameters():
-            param.requires_grad = True
-
-
-def build_stage_optimizer(
-    model: VIPERClassifier,
-    head_lr: float,
-    unfreeze_blocks: int,
-) -> optim.Optimizer:
-    """
-    Create an Adam optimizer for the active training stage.
-
-    Stage 1: classifier only at the base learning rate.
-    Stage 2: classifier at the base learning rate, last MBConv blocks at
-    a 10x smaller learning rate.
-    """
-    classifier_params = list(model.backbone.classifier.parameters())
-
-    if unfreeze_blocks <= 0:
-        return optim.Adam(classifier_params, lr=head_lr)
-
-    feature_layers = list(model.backbone.features.children())
-    backbone_params = [
-        param
-        for layer in feature_layers[-unfreeze_blocks:]
-        for param in layer.parameters()
-        if param.requires_grad
-    ]
-
-    param_groups = [{"params": classifier_params, "lr": head_lr}]
-    if backbone_params:
-        param_groups.append(
-            {
-                "params": backbone_params,
-                "lr": head_lr / BACKBONE_LR_DIVISOR,
-            }
-        )
-
-    return optim.Adam(param_groups)
-
-
-def build_stage_scheduler(
-    optimizer: optim.Optimizer,
-    stage_epochs: int,
-) -> CosineAnnealingLR:
-    """Attach a cosine schedule sized to the current training stage."""
-    return CosineAnnealingLR(optimizer, T_max=max(stage_epochs, 1), eta_min=1e-6)
-
-
-class FocalLoss(nn.Module):
-    """
-    Multi-class focal loss over class-index targets.
-
-    This keeps the existing two-logit classifier API intact while down-weighting
-    easy examples and emphasizing borderline mistakes.
-    """
-
-    def __init__(self, gamma: float = FOCAL_GAMMA, alpha: float | None = FOCAL_ALPHA):
-        super().__init__()
-        self.gamma = gamma
-        self.alpha = alpha
-
-    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-        ce_loss = F.cross_entropy(logits, targets, reduction="none")
-        pt = torch.exp(-ce_loss)
-        focal_weight = (1.0 - pt) ** self.gamma
-
-        if self.alpha is not None:
-            alpha_t = torch.where(
-                targets == 1,
-                torch.full_like(ce_loss, self.alpha),
-                torch.full_like(ce_loss, 1.0 - self.alpha),
-            )
-            focal_weight = focal_weight * alpha_t
-
-        return (focal_weight * ce_loss).mean()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -276,9 +173,6 @@ def train(
     print(f"  Epochs   : {n_epochs}")
     print(f"  LR       : {lr}")
     print(f"  Batch    : {BATCH_SIZE}")
-    print(f"  Loss     : FocalLoss(gamma={FOCAL_GAMMA}, alpha={FOCAL_ALPHA})")
-    print(f"  Stage 1  : classifier only for {min(HEAD_ONLY_EPOCHS, n_epochs)} epochs")
-    print(f"  Stage 2  : last {UNFREEZE_BLOCKS} MBConv blocks @ {lr / BACKBONE_LR_DIVISOR:.2e}")
     print(f"{'='*60}\n")
 
     # ── Dataloaders ────────────────────────────────────────────────────────────
@@ -286,20 +180,12 @@ def train(
 
     # ── Model + Loss + Optimizer + Scheduler ──────────────────────────────────
     model     = build_model(device)
-    criterion = FocalLoss()
-    head_only_epochs = min(HEAD_ONLY_EPOCHS, n_epochs)
-    fine_tune_epochs = max(n_epochs - head_only_epochs, 0)
-
-    current_unfreeze_blocks = 0
-    current_stage = "classifier_head"
-    configure_training_stage(model, current_unfreeze_blocks)
-    optimizer = build_stage_optimizer(model, lr, current_unfreeze_blocks)
-    scheduler = build_stage_scheduler(optimizer, head_only_epochs)
-    trainable, total = model.count_trainable_params()
-    print(
-        f"[DLAgent] Stage '{current_stage}' active: "
-        f"{trainable:,} / {total:,} parameters trainable"
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(
+        [p for p in model.parameters() if p.requires_grad],
+        lr=lr,
     )
+    scheduler = CosineAnnealingLR(optimizer, T_max=n_epochs, eta_min=1e-6)
 
     # ── Training loop ──────────────────────────────────────────────────────────
     best_val_f1  = 0.0
@@ -307,53 +193,26 @@ def train(
 
     for epoch in range(1, n_epochs + 1):
         t0 = time.time()
-        if epoch == head_only_epochs + 1 and fine_tune_epochs > 0:
-            current_unfreeze_blocks = UNFREEZE_BLOCKS
-            current_stage = "top_mbconv_finetune"
-            configure_training_stage(model, current_unfreeze_blocks)
-            optimizer = build_stage_optimizer(model, lr, current_unfreeze_blocks)
-            scheduler = build_stage_scheduler(optimizer, fine_tune_epochs)
-            trainable, total = model.count_trainable_params()
-            print(
-                f"\n[DLAgent] Switching to '{current_stage}': "
-                f"unfreezing last {UNFREEZE_BLOCKS} MBConv blocks "
-                f"at {lr / BACKBONE_LR_DIVISOR:.2e}"
-            )
-            print(
-                f"[DLAgent] {trainable:,} / {total:,} parameters trainable after unfreezing"
-            )
-
         print(f"\nEpoch {epoch}/{n_epochs}")
 
         train_stats = train_one_epoch(model, train_loader, optimizer, criterion, device)
         val_stats   = validate(model, val_loader, criterion, device)
         scheduler.step()
 
-        head_lr_now = optimizer.param_groups[0]["lr"]
-        backbone_lr_now = (
-            optimizer.param_groups[1]["lr"] if len(optimizer.param_groups) > 1 else None
-        )
+        lr_now  = scheduler.get_last_lr()[0]
         elapsed = time.time() - t0
 
-        status = (
+        print(
             f"  Train loss={train_stats['loss']:.4f}  acc={train_stats['acc']:.4f} | "
             f"Val loss={val_stats['loss']:.4f}  acc={val_stats['acc']:.4f}  "
-            f"F1={val_stats['f1']:.4f}  head_lr={head_lr_now:.2e}"
+            f"F1={val_stats['f1']:.4f}  lr={lr_now:.2e}  [{elapsed:.1f}s]"
         )
-        if backbone_lr_now is not None:
-            status += f"  backbone_lr={backbone_lr_now:.2e}"
-        status += f"  [{elapsed:.1f}s]"
-        print(status)
 
         record = {"epoch": epoch, **train_stats,
                   "val_loss": val_stats["loss"],
                   "val_acc":  val_stats["acc"],
                   "val_f1":   val_stats["f1"],
-                  "stage":    current_stage,
-                  "lr":       head_lr_now,
-                  "head_lr":  head_lr_now}
-        if backbone_lr_now is not None:
-            record["backbone_lr"] = backbone_lr_now
+                  "lr":       lr_now}
         history.append(record)
 
         # ── Save best checkpoint ───────────────────────────────────────────────
