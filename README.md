@@ -238,9 +238,9 @@ Search for `# AGENT_TASK:` comments in each file for specific extension points.
 
 | Metric | Baseline (LR) | EfficientNet-B0 |
 |--------|--------------|-----------------|
-| Accuracy | — | — |
-| F1 | — | — |
-| AUC-ROC | — | — |
+| Accuracy | 0.7118 | 0.8219 |
+| F1 | 0.7783 | 0.8471 |
+| AUC-ROC | 0.8007 | 0.9321 |
 
 See `results/eval_metrics.json` and `results/baseline_metrics.json`.
 
