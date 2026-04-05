@@ -1,4 +1,4 @@
-# VIPER Forensic Engine — ArtHeist 2026
+# VIPER Forensic Engine — DataHeist 2026
 
 > **Detecting AI-Generated Art with Forensic Precision**
 > Multi-stage computer vision pipeline: statistical analysis → deep learning → interpretability
