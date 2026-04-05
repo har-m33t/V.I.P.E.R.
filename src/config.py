@@ -28,9 +28,10 @@ CHECKPOINTS_DIR  = ROOT / "checkpoints"
 GRADCAM_DIR      = ROOT / "gradcam_gallery"
 OMNI_DIR         = ROOT / "omni_export"
 NOTEBOOKS_DIR    = ROOT / "notebooks"
+TORCH_WEIGHTS_DIR = CHECKPOINTS_DIR / "torchvision_weights"
 
 # Create all output directories on import
-for _dir in [RESULTS_DIR, CHECKPOINTS_DIR, GRADCAM_DIR, OMNI_DIR, NOTEBOOKS_DIR]:
+for _dir in [RESULTS_DIR, CHECKPOINTS_DIR, GRADCAM_DIR, OMNI_DIR, NOTEBOOKS_DIR, TORCH_WEIGHTS_DIR]:
     _dir.mkdir(parents=True, exist_ok=True)
 
 # ─── Output File Paths ────────────────────────────────────────────────────────
@@ -49,11 +50,11 @@ OMNI_METADATA_CSV     = OMNI_DIR / "metadata.csv"
 BATCH_SIZE    = int(os.getenv("BATCH_SIZE", 64))
 NUM_EPOCHS    = int(os.getenv("NUM_EPOCHS", 10))
 LEARNING_RATE = float(os.getenv("LEARNING_RATE", 1e-4))
-NUM_WORKERS   = int(os.getenv("NUM_WORKERS", 2))
+NUM_WORKERS   = int(os.getenv("NUM_WORKERS", 0 if os.name == "nt" else 2))
 SEED          = int(os.getenv("SEED", 42))
 
 # ─── Image Configuration ──────────────────────────────────────────────────────
-IMAGE_SIZE    = 224       # EfficientNet-B0 input
+IMAGE_SIZE    = 224       # ConvNeXt-Tiny input
 NUM_CLASSES   = 2         # 0 = REAL, 1 = AI_GENERATED
 
 # ─── Class Labels ─────────────────────────────────────────────────────────────
@@ -67,8 +68,13 @@ EDA_SAMPLE_SIZE    = 500  # max images to sample for EDA (speed)
 FFT_LOG_SCALE      = True
 
 # ─── Model Architecture ───────────────────────────────────────────────────────
-MODEL_NAME         = "efficientnet_b0"
-UNFREEZE_BLOCKS    = 3    # last 3 MBConv blocks + classifier
+MODEL_NAME          = "convnext_tiny"
+IMAGE_EMBED_DIM     = 768
+UNFREEZE_STAGES     = 2   # last N ConvNeXt stages + classifier
+CLASSIFIER_DROPOUT  = 0.3
+USE_EDA_FEATURES    = os.getenv("USE_EDA_FEATURES", "0") == "1"
+FUSION_HIDDEN_DIM   = int(os.getenv("FUSION_HIDDEN_DIM", 384))
+STRICT_EDA_COVERAGE = os.getenv("STRICT_EDA_COVERAGE", "1") == "1"
 
 # ─── Evaluation ───────────────────────────────────────────────────────────────
 VAL_SPLIT          = 0.15
