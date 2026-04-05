@@ -1,8 +1,8 @@
 """
-src/omni.py - VIPER Forensic Engine executive-language explainers.
+src/omni.py - VIPER Forensic Engine tactical-language explainers.
 
-This module translates structured forensic outputs into concise, non-technical
-English that fits a live demo, dashboard, or judge-facing report card.
+This module translates structured forensic outputs into concise narration for a
+live demo, dashboard, or judge-facing report card.
 """
 
 from __future__ import annotations
@@ -11,6 +11,13 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 DEFAULT_MODEL_NAME = "VIPER"
+
+_SIGNAL_LABELS = {
+    "fft": "FFT",
+    "prnu": "PRNU",
+    "lab": "LAB",
+    "gradcam": "Grad-CAM",
+}
 
 _GENERIC_VERDICTS = {
     "synthetic artifact pattern detected",
@@ -40,17 +47,17 @@ _LEVEL_TO_SCORE = {
 }
 
 _ANOMALY_PHRASES = {
-    "fft": "elevated high-frequency FFT activity",
-    "prnu": "an irregular sensor-noise pattern",
-    "lab": "unnatural color saturation",
-    "gradcam": "concentrated attention on localized artifact regions",
+    "fft": "FFT irregularities",
+    "prnu": "PRNU noise drift",
+    "lab": "LAB saturation spikes",
+    "gradcam": "Grad-CAM artifact hotspots",
 }
 
 _NATURAL_PHRASES = {
-    "fft": "a frequency profile close to the natural baseline",
-    "prnu": "a comparatively stable noise signature",
-    "lab": "restrained color saturation",
-    "gradcam": "diffuse attention rather than concentrated artifact hotspots",
+    "fft": "natural FFT entropy",
+    "prnu": "stable PRNU noise",
+    "lab": "restrained LAB saturation",
+    "gradcam": "diffuse Grad-CAM attention",
 }
 
 __all__ = [
@@ -230,6 +237,51 @@ def _normalized_evidence_from_breakdown(items: Any) -> list[dict[str, Any]]:
     return normalized
 
 
+def _normalized_evidence_from_signal_scores(payload: Any) -> list[dict[str, Any]]:
+    if not isinstance(payload, Mapping):
+        return []
+
+    normalized: list[dict[str, Any]] = []
+    for raw_key, raw_value in payload.items():
+        signal_id = _canonical_signal_id(raw_key)
+        label = ""
+        detail = ""
+        score = None
+        level = None
+
+        if isinstance(raw_value, Mapping):
+            signal_id = signal_id or _canonical_signal_id(raw_value.get("id") or raw_value.get("label"))
+            label = _clean_text(raw_value.get("label"))
+            detail = _clean_text(raw_value.get("detail"))
+            score = _parse_score(raw_value.get("score"))
+            level = _normalize_level(
+                raw_value.get("label")
+                or raw_value.get("status")
+                or raw_value.get("bucket")
+            )
+        else:
+            label = _clean_text(raw_key)
+            score = _parse_score(raw_value)
+            level = _normalize_level(raw_value)
+
+        if signal_id is None:
+            continue
+        if score is None and level is not None:
+            score = _LEVEL_TO_SCORE[level]
+        if score is None:
+            continue
+
+        normalized.append(
+            {
+                "id": signal_id,
+                "label": label or _SIGNAL_LABELS.get(signal_id, signal_id.upper()),
+                "score": score,
+                "detail": detail,
+            }
+        )
+    return normalized
+
+
 def _extract_signal_from_fields(report_card: Mapping[str, Any], signal_id: str) -> dict[str, Any] | None:
     direct_value = report_card.get(signal_id)
     score = None
@@ -270,6 +322,10 @@ def _extract_signal_from_fields(report_card: Mapping[str, Any], signal_id: str) 
 
 def _collect_evidence(report_card: Mapping[str, Any]) -> list[dict[str, Any]]:
     evidence = _normalized_evidence_from_breakdown(report_card.get("evidence_breakdown"))
+    if evidence:
+        return evidence
+
+    evidence = _normalized_evidence_from_signal_scores(report_card.get("signal_scores"))
     if evidence:
         return evidence
 
@@ -316,7 +372,7 @@ def _supporting_phrases(
 
 def explain_forensic_report_card(report_card: Mapping[str, Any]) -> str:
     """
-    Turn a forensic report dictionary into a short executive-language insight.
+    Turn a forensic report dictionary into a short tactical insight.
 
     The function accepts either the current backend prediction payload or a
     lighter-weight report card containing prediction/confidence plus FFT, PRNU,
@@ -328,55 +384,67 @@ def explain_forensic_report_card(report_card: Mapping[str, Any]) -> str:
     model_name = _clean_text(report_card.get("model_name")) or DEFAULT_MODEL_NAME
     prediction = _prediction_label(report_card)
     confidence = _predicted_confidence(report_card, prediction)
-    verdict = _clean_text(report_card.get("final_verdict") or report_card.get("verdict"))
     evidence = _collect_evidence(report_card)
     phrases = _supporting_phrases(evidence, prediction)
 
     if prediction == "real":
-        decision_label = "authentic rather than AI-generated"
-    elif prediction == "ai":
-        decision_label = "AI-generated"
-    else:
-        decision_label = "forensically suspicious"
-
-    if confidence is None:
-        intro = f"{model_name}'s forensic read favors a {decision_label} interpretation"
-    elif confidence < 0.68:
-        if prediction == "real":
-            intro = (
-                f"{model_name} leans authentic at {confidence:.0%} confidence, "
-                "so this is a close call rather than a decisive clearance"
-            )
-        elif prediction == "ai":
-            intro = (
-                f"{model_name} leans AI-generated at {confidence:.0%} confidence, "
-                "so this is a close call rather than a decisive flag"
+        first_sentence = (
+            f"Optics confirm {_oxford_join(phrases)}."
+            if phrases
+            else "Optics read mostly natural."
+        )
+        if confidence is None:
+            second_sentence = "Target looks authentic. The vault is yours."
+        elif confidence < 0.68:
+            second_sentence = (
+                f"{model_name} only leans authentic at {confidence:.0%} confidence; "
+                "move like this target is a close call."
             )
         else:
-            intro = (
-                f"{model_name} shows only a modest signal at {confidence:.0%} confidence, "
-                "so this case sits near the decision boundary"
+            second_sentence = (
+                f"{model_name} clears the target as authentic at {confidence:.0%} confidence; "
+                "the vault is yours."
             )
+        return f"{first_sentence} {second_sentence}"
+
+    if prediction == "ai":
+        first_sentence = (
+            f"Warning: {_oxford_join(phrases)} detected."
+            if phrases
+            else "Warning: synthetic markers are showing."
+        )
+        if confidence is None:
+            second_sentence = "This reads like a generative forgery; leave it."
+        elif confidence < 0.68:
+            second_sentence = (
+                f"{model_name} only leans toward a generative forgery at {confidence:.0%} confidence; "
+                "treat this target as a border case and be ready to abort."
+            )
+        else:
+            second_sentence = (
+                f"{model_name} tags the target as a generative forgery at {confidence:.0%} confidence; "
+                "leave it."
+            )
+        return f"{first_sentence} {second_sentence}"
+
+    first_sentence = (
+        f"Signal sweep is mixed, with {_oxford_join(phrases)} on the board."
+        if phrases
+        else "Signal sweep is mixed and the board is not clean."
+    )
+    if confidence is None:
+        second_sentence = "This target stays in contested space; verify before you move."
+    elif confidence < 0.68:
+        second_sentence = (
+            f"{model_name} is only {confidence:.0%} confident either way; "
+            "verify before you move."
+        )
     else:
-        intro = f"{model_name} is {confidence:.0%} confident this image is {decision_label}"
-
-    if confidence is not None and confidence < 0.68:
-        if phrases:
-            return (
-                f"{intro}, with the strongest cues coming from {_oxford_join(phrases)}. "
-                "The supporting evidence remains mixed."
-            )
-        return f"{intro}. The supporting evidence remains mixed."
-
-    if phrases:
-        connector = "supported primarily by" if prediction == "real" else "driven primarily by"
-        return f"{intro}, {connector} {_oxford_join(phrases)}."
-
-    if verdict and not _generic_verdict(verdict):
-        verdict = verdict.rstrip(".")
-        return f"{intro}. Overall assessment: {_sentence_case(verdict)}."
-
-    return f"{intro}."
+        second_sentence = (
+            f"{model_name} reads this target as suspicious at {confidence:.0%} confidence; "
+            "verify before you move."
+        )
+    return f"{first_sentence} {second_sentence}"
 
 
 def explain_report_card(report_card: Mapping[str, Any]) -> str:
