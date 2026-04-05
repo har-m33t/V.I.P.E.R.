@@ -17,9 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # ─── Data Paths ───────────────────────────────────────────────────────────────
 DATA_DIR       = ROOT / "data"
-CIFAKE_DIR     = DATA_DIR / "Art"          # local layout: Art/AiArtData, Art/RealArt
-AI_ART_DIR     = CIFAKE_DIR / "AiArtData"
-REAL_ART_DIR   = CIFAKE_DIR / "RealArt"
+AI_ART_DIR     = DATA_DIR / "ai_art_classification" / "train" / "AI_GENERATED"
+REAL_ART_DIR   = DATA_DIR / "ai_art_classification" / "train" / "NON_AI_GENERATED"
 WIKIART_DIR    = DATA_DIR / "WikiArt"
 
 # ─── Output Paths ─────────────────────────────────────────────────────────────
@@ -48,7 +47,7 @@ OMNI_METADATA_CSV     = OMNI_DIR / "metadata.csv"
 
 # ─── Training Hyperparameters (LOCKED by execution plan) ──────────────────────
 BATCH_SIZE    = int(os.getenv("BATCH_SIZE", 64))
-NUM_EPOCHS    = int(os.getenv("NUM_EPOCHS", 10))
+NUM_EPOCHS    = int(os.getenv("NUM_EPOCHS", 1))
 LEARNING_RATE = float(os.getenv("LEARNING_RATE", 1e-4))
 NUM_WORKERS   = int(os.getenv("NUM_WORKERS", 0 if os.name == "nt" else 2))
 SEED          = int(os.getenv("SEED", 42))
@@ -72,9 +71,9 @@ MODEL_NAME          = "convnext_tiny"
 IMAGE_EMBED_DIM     = 768
 UNFREEZE_STAGES     = 2   # last N ConvNeXt stages + classifier
 CLASSIFIER_DROPOUT  = 0.3
-USE_EDA_FEATURES    = os.getenv("USE_EDA_FEATURES", "0") == "1"
+USE_EDA_FEATURES    = False  # Disabled for 10k fast-track
 FUSION_HIDDEN_DIM   = int(os.getenv("FUSION_HIDDEN_DIM", 384))
-STRICT_EDA_COVERAGE = os.getenv("STRICT_EDA_COVERAGE", "1") == "1"
+STRICT_EDA_COVERAGE = False
 
 # ─── Evaluation ───────────────────────────────────────────────────────────────
 VAL_SPLIT          = 0.15

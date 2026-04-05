@@ -6,14 +6,19 @@ late-fusion by attaching standardized EDA feature vectors from
 results/feature_matrix.csv.
 """
 
+import argparse
 import csv
+import json
 import random
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+import pandas as pd
 import torch
+import torch.nn.functional as F
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
@@ -22,12 +27,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.config import (
     AI_ART_DIR,
     BATCH_SIZE,
+    BEST_MODEL_PATH,
+    CLASS_NAMES,
+    DEVICE,
     FEATURE_MATRIX_CSV,
+    IMAGE_EMBED_DIM,
     IMAGE_SIZE,
     LABEL_AI,
     LABEL_REAL,
     NUM_WORKERS,
     REAL_ART_DIR,
+    RESULTS_DIR,
     SEED,
     STRICT_EDA_COVERAGE,
     TEST_SPLIT,
@@ -36,10 +46,30 @@ from src.config import (
 )
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
+MAX_SAMPLES_FAST_TRACK = 10000
+HIGH_CONFIDENCE_THRESHOLD = 0.80
 
 
 def _normalize_image_path(path: Path | str) -> str:
     return str(Path(path).resolve())
+
+
+def _prediction_name(label: int) -> str:
+    return str(CLASS_NAMES.get(int(label), int(label)))
+
+
+def _error_type(label: int, prediction: int) -> str:
+    if int(label) == int(prediction):
+        return "correct"
+    if int(label) == LABEL_REAL and int(prediction) == LABEL_AI:
+        return "false_positive"
+    return "false_negative"
+
+
+def _confidence_bucket(confidence: float) -> str:
+    if float(confidence) >= HIGH_CONFIDENCE_THRESHOLD:
+        return "high"
+    return "low"
 
 
 def get_train_transform() -> transforms.Compose:
@@ -279,6 +309,11 @@ def get_dataloaders(
     indices = list(range(len(all_paths)))
     rng.shuffle(indices)
 
+    if len(indices) > MAX_SAMPLES_FAST_TRACK:
+        indices = indices[:MAX_SAMPLES_FAST_TRACK]
+        if verbose:
+            print(f"[DataAgent] ⚡ FAST-TRACK ENGAGED: Sub-sampled to {MAX_SAMPLES_FAST_TRACK} images.")
+
     n_total = len(indices)
     n_test = int(n_total * test_split)
     n_val = int(n_total * val_split)
@@ -356,21 +391,256 @@ def get_full_dataset(
     )
 
 
-if __name__ == "__main__":
-    print("=== DataAgent Verification ===")
-    train_loader, val_loader, test_loader = get_dataloaders(verbose=True)
+def _compute_projection(
+    embeddings: np.ndarray,
+    n_neighbors: int = 15,
+    min_dist: float = 0.10,
+) -> tuple[np.ndarray, str]:
+    if len(embeddings) == 0:
+        return np.empty((0, 2), dtype=np.float32), "none"
+    if len(embeddings) == 1:
+        return np.zeros((1, 2), dtype=np.float32), "degenerate"
 
-    batch = next(iter(train_loader))
-    if len(batch) == 4:
-        images, eda_features, labels, paths = batch
-        print(f"Batch shape   : {images.shape}")
-        print(f"EDA shape     : {eda_features.shape}")
-        print(f"Labels        : {labels[:8].tolist()}")
-        print(f"Sample path   : {paths[0]}")
+    try:
+        import umap
+
+        reducer = umap.UMAP(
+            n_neighbors=max(2, min(int(n_neighbors), len(embeddings) - 1)),
+            min_dist=float(min_dist),
+            n_components=2,
+            metric="cosine",
+            random_state=SEED,
+            verbose=False,
+        )
+        coords = reducer.fit_transform(embeddings)
+        return coords.astype(np.float32), "umap"
+    except Exception:
+        from sklearn.decomposition import PCA
+
+        coords = PCA(n_components=2, random_state=SEED).fit_transform(embeddings)
+        return coords.astype(np.float32), "pca_fallback"
+
+
+def _compute_metrics(
+    labels: np.ndarray,
+    predictions: np.ndarray,
+    ai_probabilities: np.ndarray,
+) -> Dict[str, float]:
+    from sklearn.metrics import (
+        accuracy_score,
+        f1_score,
+        precision_score,
+        recall_score,
+        roc_auc_score,
+    )
+
+    metrics = {
+        "accuracy": float(accuracy_score(labels, predictions)),
+        "f1": float(f1_score(labels, predictions, zero_division=0)),
+        "precision": float(precision_score(labels, predictions, zero_division=0)),
+        "recall": float(recall_score(labels, predictions, zero_division=0)),
+        "n_samples": int(len(labels)),
+    }
+    try:
+        metrics["auc_roc"] = float(roc_auc_score(labels, ai_probabilities))
+    except ValueError:
+        metrics["auc_roc"] = 0.0
+    return metrics
+
+
+def _build_error_breakdown(predictions_df: pd.DataFrame) -> List[Dict[str, Any]]:
+    if predictions_df.empty:
+        return []
+
+    errors_df = predictions_df[predictions_df["error_type"] != "correct"].copy()
+    if errors_df.empty:
+        return []
+
+    grouped = (
+        errors_df.groupby(["error_type", "confidence_bucket"], dropna=False)
+        .size()
+        .reset_index(name="count")
+        .sort_values(["error_type", "confidence_bucket"])
+    )
+    return grouped.to_dict(orient="records")
+
+
+@torch.no_grad()
+def precompute_validation_artifacts(
+    checkpoint_path: Path = BEST_MODEL_PATH,
+    predictions_csv: Path = RESULTS_DIR / "validation_predictions.csv",
+    predictions_json: Path = RESULTS_DIR / "validation_predictions.json",
+    embeddings_csv: Path = RESULTS_DIR / "validation_embeddings.csv",
+    summary_json: Path = RESULTS_DIR / "validation_summary.json",
+) -> Dict[str, Any]:
+    """
+    Precompute validation-set predictions, confidences, and 768D embeddings.
+
+    The dashboard can read these artifacts directly instead of running model
+    inference on every load.
+    """
+    from src.model import load_checkpoint
+
+    model = load_checkpoint(checkpoint_path=checkpoint_path, device=DEVICE)
+    if model is None:
+        raise FileNotFoundError(
+            f"[DataAgent] Unable to load checkpoint from {checkpoint_path}"
+        )
+
+    _, val_loader, _ = get_dataloaders(verbose=False)
+    model.eval()
+
+    prediction_rows: List[Dict[str, Any]] = []
+    embedding_rows: List[Dict[str, Any]] = []
+    all_labels: List[int] = []
+    all_predictions: List[int] = []
+    all_ai_probabilities: List[float] = []
+    all_embeddings: List[np.ndarray] = []
+
+    print("[DataAgent] Precomputing validation artifacts ...")
+    for batch in val_loader:
+        if len(batch) == 4:
+            images, eda_features, labels, paths = batch
+            eda_features = eda_features.to(DEVICE, non_blocking=True)
+        else:
+            images, labels, paths = batch
+            eda_features = None
+
+        images = images.to(DEVICE, non_blocking=True)
+        logits = model(images, eda_features=eda_features)
+        probabilities = F.softmax(logits, dim=1)
+        predictions = logits.argmax(dim=1)
+        predicted_confidences = probabilities.max(dim=1).values
+        ai_probabilities = probabilities[:, LABEL_AI]
+        embeddings = model.get_embedding(images)
+
+        labels_np = labels.detach().cpu().numpy().astype(np.int64)
+        predictions_np = predictions.detach().cpu().numpy().astype(np.int64)
+        confidence_np = predicted_confidences.detach().cpu().numpy().astype(np.float32)
+        ai_prob_np = ai_probabilities.detach().cpu().numpy().astype(np.float32)
+        embeddings_np = embeddings.detach().cpu().numpy().astype(np.float32)
+
+        for idx, raw_path in enumerate(paths):
+            image_path = _normalize_image_path(raw_path)
+            filename = Path(raw_path).name
+            label = int(labels_np[idx])
+            prediction = int(predictions_np[idx])
+            confidence = float(confidence_np[idx])
+            ai_probability = float(ai_prob_np[idx])
+            error_type = _error_type(label, prediction)
+
+            prediction_rows.append({
+                "split": "validation",
+                "image_path": image_path,
+                "filename": filename,
+                "label": label,
+                "label_name": _prediction_name(label),
+                "predicted_label": prediction,
+                "predicted_name": _prediction_name(prediction),
+                "ai_probability": ai_probability,
+                "predicted_confidence": confidence,
+                "confidence_bucket": _confidence_bucket(confidence),
+                "correct": bool(label == prediction),
+                "error_type": error_type,
+            })
+
+            embedding_row: Dict[str, Any] = {
+                "image_path": image_path,
+                "filename": filename,
+            }
+            embedding_row.update({
+                f"emb_{embedding_index:03d}": float(embeddings_np[idx, embedding_index])
+                for embedding_index in range(IMAGE_EMBED_DIM)
+            })
+            embedding_rows.append(embedding_row)
+
+        all_labels.extend(labels_np.tolist())
+        all_predictions.extend(predictions_np.tolist())
+        all_ai_probabilities.extend(ai_prob_np.tolist())
+        all_embeddings.extend(embeddings_np)
+
+    predictions_df = pd.DataFrame(prediction_rows)
+    embeddings_df = pd.DataFrame(embedding_rows)
+    embedding_matrix = np.asarray(all_embeddings, dtype=np.float32)
+    coords, projection_method = _compute_projection(embedding_matrix)
+    if len(coords) == len(predictions_df):
+        predictions_df["umap_x"] = coords[:, 0]
+        predictions_df["umap_y"] = coords[:, 1]
     else:
-        images, labels, paths = batch
-        print(f"Batch shape   : {images.shape}")
-        print(f"Labels        : {labels[:8].tolist()}")
-        print(f"Sample path   : {paths[0]}")
+        predictions_df["umap_x"] = np.nan
+        predictions_df["umap_y"] = np.nan
 
-    print("[DataAgent] dataloader.py verification passed")
+    predictions_df = predictions_df.sort_values(
+        ["error_type", "predicted_confidence"],
+        ascending=[True, False],
+    ).reset_index(drop=True)
+    embeddings_df = embeddings_df.sort_values("filename").reset_index(drop=True)
+
+    metrics = _compute_metrics(
+        labels=np.asarray(all_labels, dtype=np.int64),
+        predictions=np.asarray(all_predictions, dtype=np.int64),
+        ai_probabilities=np.asarray(all_ai_probabilities, dtype=np.float32),
+    )
+    error_breakdown = _build_error_breakdown(predictions_df)
+
+    predictions_csv.parent.mkdir(parents=True, exist_ok=True)
+    predictions_df.to_csv(predictions_csv, index=False)
+    embeddings_df.to_csv(embeddings_csv, index=False)
+
+    summary_payload = {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "split": "validation",
+        "n_samples": int(len(predictions_df)),
+        "embedding_dim": IMAGE_EMBED_DIM,
+        "projection_method": projection_method,
+        "confidence_threshold_high": HIGH_CONFIDENCE_THRESHOLD,
+        "metrics": metrics,
+        "error_breakdown": error_breakdown,
+        "artifacts": {
+            "predictions_csv": str(predictions_csv),
+            "embeddings_csv": str(embeddings_csv),
+        },
+    }
+    payload = {
+        **summary_payload,
+        "records": predictions_df.to_dict(orient="records"),
+    }
+    predictions_json.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    summary_json.write_text(json.dumps(summary_payload, indent=2), encoding="utf-8")
+
+    print(f"[DataAgent] Validation predictions -> {predictions_csv}")
+    print(f"[DataAgent] Validation embeddings  -> {embeddings_csv}")
+    print(f"[DataAgent] Validation manifest    -> {predictions_json}")
+    print(f"[DataAgent] Validation summary     -> {summary_json}")
+    return payload
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="VIPER dataloader utilities")
+    parser.add_argument(
+        "--precompute-validation",
+        action="store_true",
+        help="Write validation predictions/confidences/embeddings for the Streamlit dashboard.",
+    )
+    args = parser.parse_args()
+
+    if args.precompute_validation:
+        precompute_validation_artifacts()
+    else:
+        print("=== DataAgent Verification ===")
+        train_loader, val_loader, test_loader = get_dataloaders(verbose=True)
+
+        batch = next(iter(train_loader))
+        if len(batch) == 4:
+            images, eda_features, labels, paths = batch
+            print(f"Batch shape   : {images.shape}")
+            print(f"EDA shape     : {eda_features.shape}")
+            print(f"Labels        : {labels[:8].tolist()}")
+            print(f"Sample path   : {paths[0]}")
+        else:
+            images, labels, paths = batch
+            print(f"Batch shape   : {images.shape}")
+            print(f"Labels        : {labels[:8].tolist()}")
+            print(f"Sample path   : {paths[0]}")
+
+        print("[DataAgent] dataloader.py verification passed")

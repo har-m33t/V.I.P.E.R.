@@ -21,7 +21,7 @@ Usage:
 import sys
 import warnings
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Literal, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -48,6 +48,10 @@ warnings.filterwarnings("ignore")
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 FEATURE_META_COLUMNS = {"image_path", "label"}
+SCORE_LOW_Z = 1.0
+SCORE_HIGH_Z = 2.0
+MAX_REFERENCE_Z = 3.0
+SignalLabel = Literal["low", "medium", "high"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -117,6 +121,25 @@ def fft_analysis(img_rgb: np.ndarray) -> Dict[str, float]:
     }
 
 
+def compute_lab_saturation(img_rgb: np.ndarray) -> Dict[str, float]:
+    """
+    Measure chroma spread in CIELAB space as a normalized saturation proxy.
+
+    Returns:
+        Dict with keys: lab_chroma_mean, lab_chroma_std, lab_saturation
+    """
+    img_lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2LAB).astype(np.float32)
+    a_channel = img_lab[:, :, 1] - 128.0
+    b_channel = img_lab[:, :, 2] - 128.0
+    chroma = np.sqrt(a_channel ** 2 + b_channel ** 2)
+    chroma_norm = chroma / 181.0
+    return {
+        "lab_chroma_mean": float(chroma_norm.mean()),
+        "lab_chroma_std":  float(chroma_norm.std()),
+        "lab_saturation":  float(np.percentile(chroma_norm, 90)),
+    }
+
+
 def compute_color_entropy(img_rgb: np.ndarray, k: int = EDA_KMEANS_K) -> Dict[str, float]:
     """
     Estimate color palette entropy using KMeans clustering in CIELAB space.
@@ -159,13 +182,17 @@ def compute_color_entropy(img_rgb: np.ndarray, k: int = EDA_KMEANS_K) -> Dict[st
     img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
     hue_std = float(img_hsv[:, :, 0].std())
 
-    return {
+    lab_metrics = compute_lab_saturation(img_rgb)
+
+    features = {
         "color_entropy":    entropy,
         "dominant_color_r": float(dominant_rgb[0]) / 255.0,
         "dominant_color_g": float(dominant_rgb[1]) / 255.0,
         "dominant_color_b": float(dominant_rgb[2]) / 255.0,
         "hue_std":          hue_std,
     }
+    features.update(lab_metrics)
+    return features
 
 
 def noise_residuals(img_rgb: np.ndarray) -> Dict[str, float]:
@@ -405,6 +432,266 @@ def build_standardized_feature_vector(
             raise ImportError("torch is required when as_tensor=True.")
         return torch.from_numpy(standardized)
     return standardized
+
+
+def load_reference_feature_matrix(
+    reference_csv: Path = FEATURE_MATRIX_CSV,
+) -> pd.DataFrame:
+    """Load the saved feature matrix used as the anomaly reference corpus."""
+    if not reference_csv.exists():
+        raise FileNotFoundError(
+            f"Reference feature matrix not found at {reference_csv}"
+        )
+    reference_df = pd.read_csv(reference_csv)
+    if reference_df.empty:
+        raise ValueError("Reference feature matrix is empty.")
+    return reference_df
+
+
+def _signal_label(z_score: float) -> SignalLabel:
+    if z_score >= SCORE_HIGH_Z:
+        return "high"
+    if z_score >= SCORE_LOW_Z:
+        return "medium"
+    return "low"
+
+
+def _signal_bucket(z_score: float) -> Dict[str, Any]:
+    return {
+        "score": round(float(np.clip(z_score / MAX_REFERENCE_Z, 0.0, 1.0)), 4),
+        "label": _signal_label(z_score),
+    }
+
+
+def _feature_zscore(
+    feature_row: Mapping[str, Any],
+    reference_df: pd.DataFrame,
+    feature_name: str,
+) -> Optional[float]:
+    if feature_name not in feature_row or feature_name not in reference_df.columns:
+        return None
+
+    series = pd.to_numeric(reference_df[feature_name], errors="coerce").dropna()
+    if series.empty:
+        return None
+
+    mean = float(series.mean())
+    std = float(series.std(ddof=0))
+    value = float(feature_row[feature_name])
+    if std < 1e-6:
+        return 0.0 if abs(value - mean) < 1e-6 else MAX_REFERENCE_Z
+    return abs(value - mean) / std
+
+
+def _combine_zscores(
+    feature_row: Mapping[str, Any],
+    reference_df: pd.DataFrame,
+    feature_names: Sequence[str],
+    fallback: float = 0.0,
+) -> float:
+    zscores = [
+        z_score
+        for feature_name in feature_names
+        if (z_score := _feature_zscore(feature_row, reference_df, feature_name)) is not None
+    ]
+    if zscores:
+        return float(np.mean(zscores))
+    return float(fallback)
+
+
+def score_fft_irregularity(
+    feature_row: Mapping[str, Any],
+    reference_df: Optional[pd.DataFrame] = None,
+) -> Dict[str, Any]:
+    """
+    Score frequency-domain anomalies against the dataset reference distribution.
+    """
+    reference_df = reference_df if reference_df is not None else load_reference_feature_matrix()
+    z_score = _combine_zscores(
+        feature_row=feature_row,
+        reference_df=reference_df,
+        feature_names=("fft_ratio", "fft_high_freq_energy"),
+    )
+    return _signal_bucket(z_score)
+
+
+def score_prnu_variation(
+    feature_row: Mapping[str, Any],
+    reference_df: Optional[pd.DataFrame] = None,
+) -> Dict[str, Any]:
+    """
+    Score PRNU and residual-noise irregularities against the reference corpus.
+    """
+    reference_df = reference_df if reference_df is not None else load_reference_feature_matrix()
+    z_score = _combine_zscores(
+        feature_row=feature_row,
+        reference_df=reference_df,
+        feature_names=(
+            "prnu_std",
+            "prnu_energy",
+            "prnu_fft_ratio",
+            "prnu_autocorr_peak",
+        ),
+    )
+    return _signal_bucket(z_score)
+
+
+def score_lab_saturation(
+    feature_row: Mapping[str, Any],
+    reference_df: Optional[pd.DataFrame] = None,
+) -> Dict[str, Any]:
+    """
+    Score LAB chroma saturation against the reference corpus.
+
+    Legacy feature matrices may not contain the new LAB columns yet. In that case,
+    the scorer falls back to the existing hue spread statistic so dashboards do not
+    hard-fail on older artifacts.
+    """
+    reference_df = reference_df if reference_df is not None else load_reference_feature_matrix()
+    lab_feature_names = ("lab_chroma_mean", "lab_chroma_std", "lab_saturation")
+    has_lab_reference = any(
+        feature_name in feature_row and feature_name in reference_df.columns
+        for feature_name in lab_feature_names
+    )
+    z_score = _combine_zscores(
+        feature_row=feature_row,
+        reference_df=reference_df,
+        feature_names=lab_feature_names,
+    )
+    if not has_lab_reference:
+        z_score = _combine_zscores(
+            feature_row=feature_row,
+            reference_df=reference_df,
+            feature_names=("hue_std",),
+            fallback=float(
+                feature_row.get(
+                    "lab_chroma_mean",
+                    feature_row.get("lab_saturation", 0.0),
+                )
+            ) * MAX_REFERENCE_Z,
+        )
+    return _signal_bucket(z_score)
+
+
+def score_forensic_signals(
+    feature_row: Mapping[str, Any],
+    reference_df: Optional[pd.DataFrame] = None,
+) -> Dict[str, Dict[str, Any]]:
+    """
+    Return the standardized dashboard-ready anomaly buckets for the three signals.
+    """
+    reference_df = reference_df if reference_df is not None else load_reference_feature_matrix()
+    return {
+        "fft_irregularity": score_fft_irregularity(feature_row, reference_df=reference_df),
+        "prnu_variation": score_prnu_variation(feature_row, reference_df=reference_df),
+        "lab_saturation": score_lab_saturation(feature_row, reference_df=reference_df),
+    }
+
+
+def _prediction_to_index(prediction: Any) -> int:
+    if isinstance(prediction, str):
+        normalized = prediction.strip().lower()
+        if "ai" in normalized:
+            return LABEL_AI
+        return LABEL_REAL
+    return LABEL_AI if int(prediction) == LABEL_AI else LABEL_REAL
+
+
+def build_forensic_report(
+    prediction: Any,
+    confidence: float,
+    fft_score: Mapping[str, Any],
+    prnu_score: Mapping[str, Any],
+    lab_score: Mapping[str, Any],
+    confidence_mode: str = "predicted_class",
+) -> Dict[str, Any]:
+    """
+    Assemble a strict forensic report object for dashboard or API rendering.
+
+    Args:
+        prediction: Model output label as index or string.
+        confidence: Either predicted-class confidence or direct AI probability.
+        fft_score: Output from score_fft_irregularity().
+        prnu_score: Output from score_prnu_variation().
+        lab_score: Output from score_lab_saturation().
+        confidence_mode: "predicted_class" or "ai_probability".
+    """
+    predicted_index = _prediction_to_index(prediction)
+    model_confidence = float(np.clip(confidence, 0.0, 1.0))
+
+    if confidence_mode == "ai_probability":
+        ai_probability = model_confidence
+        model_confidence = ai_probability if predicted_index == LABEL_AI else 1.0 - ai_probability
+    elif confidence_mode == "predicted_class":
+        ai_probability = model_confidence if predicted_index == LABEL_AI else 1.0 - model_confidence
+    else:
+        raise ValueError("confidence_mode must be 'predicted_class' or 'ai_probability'.")
+
+    signal_scores = {
+        "fft_irregularity": {
+            "score": float(fft_score["score"]),
+            "label": str(fft_score["label"]).lower(),
+        },
+        "prnu_variation": {
+            "score": float(prnu_score["score"]),
+            "label": str(prnu_score["label"]).lower(),
+        },
+        "lab_saturation": {
+            "score": float(lab_score["score"]),
+            "label": str(lab_score["label"]).lower(),
+        },
+    }
+    high_count = sum(item["label"] == "high" for item in signal_scores.values())
+    medium_or_higher = sum(item["label"] in {"medium", "high"} for item in signal_scores.values())
+    mean_signal_score = float(np.mean([item["score"] for item in signal_scores.values()]))
+
+    if predicted_index == LABEL_AI:
+        if ai_probability >= 0.85 and high_count >= 2:
+            verdict = "Strong AI likelihood"
+        elif ai_probability >= 0.65 or medium_or_higher >= 2:
+            verdict = "Moderate AI likelihood"
+        else:
+            verdict = "Leaning AI, but the forensic cues are mixed"
+    else:
+        if ai_probability <= 0.15 and high_count == 0 and mean_signal_score < 0.35:
+            verdict = "Strong authentic likelihood"
+        elif ai_probability <= 0.35 and high_count <= 1:
+            verdict = "Likely authentic"
+        else:
+            verdict = "Mixed signals, manual review recommended"
+
+    prediction_name = "AI-Generated" if predicted_index == LABEL_AI else "Real"
+    return {
+        "prediction": prediction_name,
+        "predicted_index": predicted_index,
+        "confidence_score": round(model_confidence, 4),
+        "confidence_pct": f"{model_confidence:.1%}",
+        "ai_probability": round(ai_probability, 4),
+        "signal_scores": signal_scores,
+        "final_verdict": verdict,
+        "verdict": verdict,
+    }
+
+
+def build_forensic_report_from_features(
+    feature_row: Mapping[str, Any],
+    prediction: Any,
+    confidence: float,
+    reference_df: Optional[pd.DataFrame] = None,
+    confidence_mode: str = "predicted_class",
+) -> Dict[str, Any]:
+    """
+    Convenience wrapper that scores the signals and returns the final report card.
+    """
+    signal_scores = score_forensic_signals(feature_row, reference_df=reference_df)
+    return build_forensic_report(
+        prediction=prediction,
+        confidence=confidence,
+        fft_score=signal_scores["fft_irregularity"],
+        prnu_score=signal_scores["prnu_variation"],
+        lab_score=signal_scores["lab_saturation"],
+        confidence_mode=confidence_mode,
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
