@@ -29,6 +29,7 @@ env/
 data/cifake/
 data/wikiart/
 data/Art/
+data/ai_art_classification/
 
 # Model checkpoints (binary, large)
 checkpoints/*.pth
