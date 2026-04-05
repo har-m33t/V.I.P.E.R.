@@ -79,20 +79,20 @@ function Dropzone({ previewUrl, fileName, isAnalyzing, onFileSelected }) {
               {isAnalyzing
                 ? 'Scanning artifact lattice...'
                 : previewUrl
-                  ? 'Preview locked. Analysis wiring comes next.'
+                  ? 'Replace image or rerun analysis.'
                   : 'Drag an image into the forensic sandbox.'}
             </h2>
           </div>
 
           <p>
-            VIPER now supports drag-and-drop image intake and live preview in
-            the dashboard shell.
+            VIPER inspects frequency balance, PRNU-style residuals, color
+            behavior, and Grad-CAM attention in one pass.
           </p>
 
           <div className="dropzone-meta">
             <span className="meta-chip">PNG / JPG / WEBP</span>
             <span className="meta-chip">Single frame</span>
-            <span className="meta-chip">Preview ready</span>
+            <span className="meta-chip">Instant inference</span>
           </div>
         </div>
 
@@ -102,13 +102,13 @@ function Dropzone({ previewUrl, fileName, isAnalyzing, onFileSelected }) {
             type="button"
             onClick={openPicker}
           >
-            {previewUrl ? 'Choose another image' : 'Select image'}
+            {previewUrl ? 'Analyze another image' : 'Select image'}
           </button>
 
           <p className="dropzone-note">
             {fileName
               ? `Current file: ${fileName}`
-              : 'The selected image stays in the local frontend state for now.'}
+              : 'The uploaded image never leaves your local demo stack.'}
           </p>
         </div>
       </div>

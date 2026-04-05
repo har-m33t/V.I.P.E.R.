@@ -13,21 +13,6 @@ function EmptyState() {
   )
 }
 
-function QueuedState({ fileName }) {
-  return (
-    <div className="report-state">
-      <div className="state-panel">
-        <span className="panel-kicker">Ready For Analysis</span>
-        <h3>{fileName || 'Image staged in the dashboard.'}</h3>
-        <p>
-          The backend inference hook is the next step. This panel is ready to
-          render the live forensic response as soon as the API is connected.
-        </p>
-      </div>
-    </div>
-  )
-}
-
 function LoadingState() {
   return (
     <div className="report-state">
@@ -35,7 +20,8 @@ function LoadingState() {
         <span className="panel-kicker">Analysis Running</span>
         <h3>VIPER is synthesizing a forensic report.</h3>
         <p>
-          Computing logits, evidence scoring, and the interpretability panel.
+          Computing ConvNeXt logits, EDA feature fusion, and Grad-CAM attention
+          traces.
         </p>
         <div className="loading-bars" aria-hidden="true">
           <span />
@@ -59,13 +45,7 @@ function ErrorState({ error }) {
   )
 }
 
-function ForensicReportCard({
-  report,
-  error,
-  fileName,
-  isAnalyzing,
-  isQueued,
-}) {
+function ForensicReportCard({ report, error, fileName, isAnalyzing }) {
   if (isAnalyzing) {
     return (
       <section className="report-card glass-panel">
@@ -85,10 +65,12 @@ function ForensicReportCard({
   if (!report) {
     return (
       <section className="report-card glass-panel">
-        {isQueued ? <QueuedState fileName={fileName} /> : <EmptyState />}
+        <EmptyState />
       </section>
     )
   }
+
+  const predictionClass = report.predicted_index === 1 ? 'is-ai' : 'is-real'
 
   return (
     <section className="report-card glass-panel">
@@ -98,7 +80,7 @@ function ForensicReportCard({
           <h2 className="report-title">{report.prediction}</h2>
         </div>
 
-        <div className="prediction-chip">
+        <div className={`prediction-chip ${predictionClass}`}>
           {report.prediction}
         </div>
       </header>
@@ -110,6 +92,53 @@ function ForensicReportCard({
         </p>
         <p className="confidence-subtext">{report.verdict}</p>
       </div>
+
+      <section className="report-meta">
+        <div className="meta-card">
+          <span className="meta-label">Uploaded file</span>
+          <strong>{fileName || report.filename}</strong>
+        </div>
+        <div className="meta-card">
+          <span className="meta-label">AI probability</span>
+          <strong>{(report.ai_probability * 100).toFixed(1)}%</strong>
+        </div>
+        <div className="meta-card">
+          <span className="meta-label">Inference path</span>
+          <strong>{report.uses_eda_fusion ? 'Hybrid fusion' : 'ConvNeXt only'}</strong>
+        </div>
+      </section>
+
+      <section className="evidence-panel">
+        <h3>Key Evidence</h3>
+        <ul className="evidence-list">
+          {report.evidence_breakdown.map((item) => (
+            <li
+              key={item.id}
+              className={`evidence-row is-${item.status}`}
+            >
+              <div className="evidence-copy">
+                <div className="evidence-heading">
+                  <span className="evidence-bullet" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </div>
+                <p>{item.detail}</p>
+              </div>
+
+              <div className="evidence-metrics">
+                <span className="evidence-value">{item.value}</span>
+                <div className="evidence-meter" aria-hidden="true">
+                  <span style={{ width: `${Math.max(item.score * 100, 8)}%` }} />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <footer className="report-footer">
+        <p>{report.gradcam_available ? 'Grad-CAM evidence included.' : 'Grad-CAM evidence unavailable in this environment.'}</p>
+        <small>{report.model_name} checkpoint loaded for live web inference.</small>
+      </footer>
     </section>
   )
 }
