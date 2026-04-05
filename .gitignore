@@ -18,6 +18,7 @@ env/
 .idea/
 *.swp
 *~
+node_modules/
 
 # Jupyter
 .ipynb_checkpoints/
