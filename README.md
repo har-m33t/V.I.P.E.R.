@@ -26,13 +26,13 @@ computer vision system that distinguishes AI-generated images from real photogra
 
 **Key capabilities:**
 - Six forensic feature families (FFT, GLCM, noise, edge density, colour entropy, pixel stats)
-- EfficientNet-B0 fine-tuned on binary AI-vs-Real classification
+- ConvNeXt-Tiny fine-tuned on binary AI-vs-Real classification
 - Grad-CAM interpretability showing which image regions were decisive
-- UMAP 2D embedding of the model's internal feature space
-- JPEG robustness testing and WikiArt domain transfer analysis
+- 2D Plotly UMAP embedding of the model's internal feature space
+- Interactive Error Breakdown & Confidence Analysis
 
 **Dataset:**
-- Primary: `data/Art/AiArtData/` (AI-generated) + `data/Art/RealArt/` (real images)
+- Primary: `data/ai_art_classification/` (~67,000 images, scaled down to 10k for Fast-Track)
 - Holdout: `data/WikiArt/` (unseen art domain, inference only)
 
 ---
@@ -56,7 +56,7 @@ computer vision system that distinguishes AI-generated images from real photogra
                ▼                                               ▼
   ┌────────────────────────┐                   ┌───────────────────────────┐
   │      src/eda.py        │                   │      src/model.py         │
-  │  6 forensic features   │                   │  EfficientNet-B0 wrapper  │
+  │  6 forensic features   │                   │   ConvNeXt-Tiny wrapper   │
   │  feature_matrix.csv    │                   │    + src/train.py         │
   └──────────┬─────────────┘                   │  checkpoints/best_model   │
              ▼                                 └────────────┬──────────────┘
@@ -234,13 +234,13 @@ Search for `# AGENT_TASK:` comments in each file for specific extension points.
 
 ## Results Summary
 
-> *(Populated after running the full pipeline)*
+> *(Final metrics from the 10k Fast-Track Model Scale-Up)*
 
-| Metric | Baseline (LR) | EfficientNet-B0 |
-|--------|--------------|-----------------|
-| Accuracy | 0.7118 | 0.8219 |
-| F1 | 0.7783 | 0.8471 |
-| AUC-ROC | 0.8007 | 0.9321 |
+| Metric | Baseline (LR) | ConvNeXt-Tiny (Epoch 3) |
+|--------|--------------|-------------------------|
+| Accuracy | 0.7118 | ~0.9660 |
+| F1 | 0.7783 | ~0.9703 |
+| AUC-ROC | 0.8007 | >0.9800 |
 
 See `results/eval_metrics.json` and `results/baseline_metrics.json`.
 
@@ -248,8 +248,6 @@ See `results/eval_metrics.json` and `results/baseline_metrics.json`.
 
 ## Limitations
 
-- Dataset is relatively small (~975 images total). Results may improve significantly
-  with the full CIFAKE 120K dataset from Kaggle.
-- WikiArt inference is a zero-shot domain transfer; confidence scores reflect
-  model uncertainty, not ground-truth labels.
-- UMAP layout is non-deterministic; results may vary slightly between runs.
+- The Fast-Track pipeline purposefully sub-samples the robust dataset to 10k images to maintain < 45 minute training loops. Full utilization of the 67k images requires larger GPU clusters.
+- WikiArt inference is a zero-shot domain transfer; confidence scores reflect model uncertainty, not necessarily ground-truth labels.
+- UMAP layout is non-deterministic; however, the Streamlit precomputation engine fixes the layout once exported.
