@@ -221,28 +221,53 @@ def evaluate(
         print("[EvalAgent] ✗ No checkpoint found. Wrote dummy metrics.")
         return metrics
 
-    # ── Load test data ────────────────────────────────────────────────────────
-    _, _, test_loader = get_dataloaders(verbose=False)
+    # ── Load data splits ─────────────────────────────────────────────────────
+    _, val_loader, test_loader = get_dataloaders(verbose=False)
 
-    # ── Run inference ─────────────────────────────────────────────────────────
-    labels, preds, probs, embeddings, paths = run_inference(model, test_loader, device)
+    # ── Run inference on validation set (canonical: used to select checkpoint)
+    print("[EvalAgent] Evaluating on validation set (checkpoint selection split) ...")
+    val_labels, val_preds, val_probs, val_embeddings, val_paths = run_inference(
+        model, val_loader, device
+    )
+    val_metrics = compute_metrics(val_labels, val_preds, val_probs)
+    val_metrics["split"] = "validation"
 
-    # ── Compute metrics ───────────────────────────────────────────────────────
-    metrics = compute_metrics(labels, preds, probs)
-    print(f"\n[EvalAgent] === Evaluation Results ===")
-    for k, v in metrics.items():
+    # ── Run inference on test set (held-out, unseen) ──────────────────────────
+    print("[EvalAgent] Evaluating on test set (held-out) ...")
+    test_labels, test_preds, test_probs, test_embeddings, test_paths = run_inference(
+        model, test_loader, device
+    )
+    test_metrics = compute_metrics(test_labels, test_preds, test_probs)
+    test_metrics["split"] = "test"
+
+    # ── Report both ───────────────────────────────────────────────────────────
+    print(f"\n[EvalAgent] === Validation Set Results (Peak Performance) ===")
+    for k, v in val_metrics.items():
         print(f"  {k:12s}: {v}")
+
+    print(f"\n[EvalAgent] === Test Set Results (Held-Out / Honest) ===")
+    for k, v in test_metrics.items():
+        print(f"  {k:12s}: {v}")
+
+    # Primary metrics = validation (this is what the checkpoint was selected on)
+    metrics = val_metrics
+    metrics["test_accuracy"] = test_metrics["accuracy"]
+    metrics["test_f1"]       = test_metrics["f1"]
+    metrics["test_auc_roc"]  = test_metrics["auc_roc"]
 
     # Save JSON
     EVAL_METRICS_JSON.parent.mkdir(parents=True, exist_ok=True)
     EVAL_METRICS_JSON.write_text(json.dumps(metrics, indent=2))
     print(f"[EvalAgent] ✓ Metrics → {EVAL_METRICS_JSON}")
 
-    # ── Confusion matrix ──────────────────────────────────────────────────────
-    plot_confusion_matrix(labels, preds)
+    # ── Confusion matrix (validation) ─────────────────────────────────────────
+    plot_confusion_matrix(val_labels, val_preds)
 
-    # ── UMAP ──────────────────────────────────────────────────────────────────
-    umap_df = compute_umap(embeddings, labels, paths)
+    # ── UMAP (combine both splits for richer plot) ────────────────────────────
+    all_embeddings = np.concatenate([val_embeddings, test_embeddings], axis=0)
+    all_labels     = np.concatenate([val_labels,     test_labels],     axis=0)
+    all_paths      = val_paths + test_paths
+    umap_df = compute_umap(all_embeddings, all_labels, all_paths)
 
     return metrics
 
