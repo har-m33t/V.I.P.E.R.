@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Dropzone from './components/Dropzone.jsx'
+import ForensicReportCard from './components/ForensicReportCard.jsx'
 import './App.css'
 
 function App() {
@@ -98,22 +99,13 @@ function App() {
           </div>
         </div>
 
-        <section className="report-card glass-panel">
-          <div className="placeholder-panel">
-            <span className="panel-kicker">Forensic Report Card</span>
-            <h2>{fileName ? 'Image captured for analysis.' : 'Evidence panel framework is in place.'}</h2>
-            <p>
-              {fileName
-                ? 'The next commit will connect this selected image to the backend and render the live forensic response here.'
-                : 'The next feature commit will replace this placeholder with the live upload and analysis interface.'}
-            </p>
-            <div className="placeholder-lines" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-        </section>
+        <ForensicReportCard
+          report={null}
+          error=""
+          fileName={fileName}
+          isAnalyzing={false}
+          isQueued={Boolean(fileName)}
+        />
       </section>
     </main>
   )
