@@ -15,16 +15,16 @@ Exit contract: raises RuntimeError if directories are missing so that
 downstream agents fail fast rather than silently.
 """
 
+import io
 import sys
 import random
 from pathlib import Path
 from typing import Tuple, List, Optional
 
 import torch
-from torch.utils.data import Dataset, DataLoader, Subset
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
-import numpy as np
 
 # ── Import project config ──────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -39,6 +39,41 @@ from src.config import (
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
 
 
+class RandomJPEGCompression:
+    """Simulate lossy re-encoding artifacts from aggressive JPEG export."""
+
+    def __init__(self, p: float = 0.35, quality_range: Tuple[int, int] = (30, 80)):
+        self.p = p
+        self.quality_range = quality_range
+
+    def __call__(self, image: Image.Image) -> Image.Image:
+        if random.random() >= self.p:
+            return image
+
+        quality = random.randint(*self.quality_range)
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=quality, optimize=True)
+        buffer.seek(0)
+        with Image.open(buffer) as compressed:
+            return compressed.convert("RGB")
+
+
+class RandomGaussianNoise:
+    """Add mild sensor-like Gaussian noise after conversion to tensor."""
+
+    def __init__(self, p: float = 0.35, sigma_range: Tuple[float, float] = (0.01, 0.06)):
+        self.p = p
+        self.sigma_range = sigma_range
+
+    def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
+        if random.random() >= self.p:
+            return tensor
+
+        sigma = random.uniform(*self.sigma_range)
+        noise = torch.randn_like(tensor) * sigma
+        return torch.clamp(tensor + noise, 0.0, 1.0)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Transforms
 # ─────────────────────────────────────────────────────────────────────────────
@@ -48,10 +83,13 @@ def get_train_transform() -> transforms.Compose:
     return transforms.Compose([
         transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
         transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2,
-                               saturation=0.2, hue=0.05),
         transforms.RandomRotation(degrees=10),
+        RandomJPEGCompression(p=0.4, quality_range=(25, 75)),
+        transforms.RandomApply([
+            transforms.ColorJitter(brightness=0.3, contrast=0.3)
+        ], p=0.7),
         transforms.ToTensor(),
+        RandomGaussianNoise(p=0.4, sigma_range=(0.01, 0.05)),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std =[0.229, 0.224, 0.225]),
     ])

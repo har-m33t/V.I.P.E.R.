@@ -19,8 +19,6 @@ To deploy an agent, simply copy the **"System Prompt"** and give it to an AI (li
 > - Always import configuration from `src/config.py`. Do not hardcode image dimensions or paths.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: Advanced Color Entropy**: Refactor the current `color_entropy` feature. Convert images to the CIELAB (`Lab`) color space before calculating k-means entropy, as AI generators often struggle with chrominance consistency.
-- [ ] **Task 2: PRNU Noise Extraction**: Implement a basic Photo Response Non-Uniformity (PRNU) noise estimator using high-pass filtering (e.g., wavelet transform denoising) to isolate sensor-noise patterns versus AI-diffusion noise patterns.
 - [ ] **Task 3: Run Baseline**: After adding these features, run `python src/baseline.py` to see if the Logistic Regression validation F1 score improves past 78%.
 
 ---

@@ -24,9 +24,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
+from PIL import Image
 from tqdm import tqdm
 
 matplotlib.use("Agg")
+
+try:
+    import plotly.express as px
+except ImportError as exc:
+    px = None
+    _PLOTLY_IMPORT_ERROR = exc
+else:
+    _PLOTLY_IMPORT_ERROR = None
 
 try:
     from pytorch_grad_cam import GradCAMPlusPlus as TorchGradCAMPlusPlus
@@ -50,7 +59,7 @@ from src.config import (  # noqa: E402
     UMAP_FEATURES_CSV,
     UMAP_SCATTER_PNG,
 )
-from src.dataloader import get_dataloaders  # noqa: E402
+from src.dataloader import get_dataloaders, get_val_transform  # noqa: E402
 from src.model import VIPERClassifier, load_checkpoint  # noqa: E402
 
 
@@ -208,51 +217,90 @@ def generate_gradcam_gallery(
 
 
 def plot_umap_scatter(
+    model: VIPERClassifier,
     umap_csv: Path = UMAP_FEATURES_CSV,
     save_png: Path = UMAP_SCATTER_PNG,
+    save_html: Optional[Path] = None,
+    device: torch.device = DEVICE,
 ) -> None:
     """
-    Plot 2D UMAP scatter coloured by class label.
+    Export an interactive 2D UMAP scatter with hover metadata.
 
-    AGENT_TASK: add hover labels with Plotly for interactive exploration
     AGENT_TASK: overlay centroids and decision boundaries
     """
+    if px is None:
+        raise ImportError(
+            "plotly is required for interactive UMAP export."
+        ) from _PLOTLY_IMPORT_ERROR
+
     if not umap_csv.exists():
         print(f"[VizAgent] {umap_csv} not found. Run evaluate.py first.")
         return
 
     df = pd.read_csv(umap_csv)
+    save_html = save_html or save_png.with_suffix(".html")
     label_map = {0: "Real", 1: "AI-Generated"}
-    colors = {0: "#4CAF50", 1: "#E53935"}
+    color_map = {"Real": "#1B998B", "AI-Generated": "#D1495B"}
+    transform = get_val_transform()
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    confidences: List[float] = []
+    model.eval()
+    with torch.no_grad():
+        for image_path in tqdm(df["image_path"], desc="UMAP confidence"):
+            image = Image.open(image_path).convert("RGB")
+            image_tensor = transform(image).unsqueeze(0).to(device)
+            logits = model(image_tensor)
+            ai_confidence = torch.softmax(logits, dim=1)[0, 1].item()
+            confidences.append(ai_confidence)
 
-    for label_id, group in df.groupby("label"):
-        ax.scatter(
-            group["umap_x"],
-            group["umap_y"],
-            c=colors[label_id],
-            label=label_map[label_id],
-            alpha=0.5,
-            s=12,
-            edgecolors="none",
-        )
+    df["label_name"] = df["label"].map(label_map)
+    df["filename"] = df["image_path"].apply(lambda p: Path(p).name)
+    df["confidence_score"] = confidences
+    df["confidence_pct"] = df["confidence_score"].map(lambda score: f"{score:.1%}")
 
-    ax.set_title(
-        "UMAP Projection of EfficientNet-B0 Feature Space\n"
-        "VIPER Forensic Engine - ArtHeist 2026",
-        fontsize=13,
+    fig = px.scatter(
+        df,
+        x="umap_x",
+        y="umap_y",
+        color="label_name",
+        color_discrete_map=color_map,
+        hover_name="filename",
+        hover_data={
+            "confidence_pct": True,
+            "label_name": True,
+            "image_path": True,
+            "umap_x": ":.3f",
+            "umap_y": ":.3f",
+            "confidence_score": False,
+        },
+        labels={
+            "umap_x": "UMAP Dimension 1",
+            "umap_y": "UMAP Dimension 2",
+            "label_name": "Class",
+            "confidence_pct": "AI Confidence",
+            "image_path": "Image Path",
+        },
+        title="VIPER Forensic Engine<br><sup>Interactive UMAP projection of EfficientNet-B0 feature space</sup>",
+        template="plotly_white",
+        opacity=0.72,
     )
-    ax.set_xlabel("UMAP Dimension 1")
-    ax.set_ylabel("UMAP Dimension 2")
-    ax.legend(markerscale=3, fontsize=10)
-    ax.grid(alpha=0.2)
+    fig.update_traces(marker={"size": 10, "line": {"width": 0.6, "color": "#F7F3E9"}})
+    fig.update_layout(
+        width=1180,
+        height=760,
+        legend_title_text="Class",
+        paper_bgcolor="#F4EFE6",
+        plot_bgcolor="#FFFDFC",
+        font={"family": "Georgia, Times New Roman, serif", "color": "#1F2933"},
+        title={"x": 0.5},
+        margin={"l": 60, "r": 40, "t": 90, "b": 60},
+    )
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(31, 41, 51, 0.12)", zeroline=False)
+    fig.update_yaxes(showgrid=True, gridcolor="rgba(31, 41, 51, 0.12)", zeroline=False)
 
-    save_png.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(save_png, dpi=150)
-    plt.close(fig)
-    print(f"[VizAgent] UMAP scatter -> {save_png}")
+    save_html.parent.mkdir(parents=True, exist_ok=True)
+    fig.write_html(save_html, include_plotlyjs="cdn", full_html=True)
+    print(f"[VizAgent] Interactive UMAP -> {save_html}")
 
 
 def build_omni_metadata(
@@ -293,7 +341,7 @@ def visualize(checkpoint_path: Path = BEST_MODEL_PATH) -> None:
     _, _, test_loader = get_dataloaders(verbose=False)
 
     generate_gradcam_gallery(model, test_loader, DEVICE)
-    plot_umap_scatter()
+    plot_umap_scatter(model=model, device=DEVICE)
     build_omni_metadata()
 
     print("[VizAgent] Visualization complete.")
