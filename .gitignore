@@ -33,6 +33,7 @@ data/Art/
 # Model checkpoints (binary, large)
 checkpoints/*.pth
 checkpoints/*.pt
+checkpoints/torchvision_weights/
 
 # Generated outputs (reproducible)
 results/*.json
