@@ -47,6 +47,9 @@ WIKIART_DATASET_HANDLE = "steubk/wikiart"
 WIKIART_DOWNLOAD_DIRNAME = "_kaggle_download"
 WIKIART_ZERO_SHOT_SAMPLE_N = min(100, STRETCH_SAMPLE_N)
 WIKIART_REMBRANDT_QUERY = "rembrandt"
+SALT_PEPPER_NOISE_LEVELS = [0.0, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2]
+SALT_PEPPER_ROBUSTNESS_PNG = JPEG_ROBUSTNESS_PNG.with_name("salt_pepper_robustness.png")
+ROBUSTNESS_METRICS_JSON = JPEG_ROBUSTNESS_PNG.with_name("robustness_metrics.json")
 
 
 def compress_jpeg(image_array: np.ndarray, quality: int) -> np.ndarray:
@@ -58,6 +61,35 @@ def compress_jpeg(image_array: np.ndarray, quality: int) -> np.ndarray:
     _, buf = cv2.imencode(".jpg", img_bgr, encode_param)
     decoded = cv2.imdecode(buf, cv2.IMREAD_COLOR)
     return cv2.cvtColor(decoded, cv2.COLOR_BGR2RGB)
+
+
+def inject_salt_and_pepper_noise(image_array: np.ndarray, intensity: float) -> np.ndarray:
+    """
+    Inject salt-and-pepper noise into an RGB image.
+
+    Args:
+        image_array: RGB uint8 image array.
+        intensity: Fraction of pixels to corrupt in [0, 1].
+    """
+    if intensity <= 0:
+        return image_array.copy()
+
+    noisy = image_array.copy()
+    h, w, _ = noisy.shape
+    n_corrupt = int(round(h * w * intensity))
+    if n_corrupt == 0:
+        return noisy
+
+    rng = np.random.default_rng(SEED)
+    coords = rng.choice(h * w, size=n_corrupt, replace=False)
+    half = n_corrupt // 2
+
+    salt_coords = coords[:half]
+    pepper_coords = coords[half:]
+
+    noisy.reshape(-1, 3)[salt_coords] = 255
+    noisy.reshape(-1, 3)[pepper_coords] = 0
+    return noisy
 
 
 @torch.no_grad()
@@ -92,6 +124,101 @@ def evaluate_at_quality(
     return correct / max(total, 1)
 
 
+@torch.no_grad()
+def evaluate_at_noise(
+    model,
+    paths: List[Path],
+    labels: List[int],
+    intensity: float,
+    device: torch.device,
+    transform,
+) -> float:
+    """Evaluate model accuracy on images corrupted with salt-and-pepper noise."""
+    model.eval()
+    correct = 0
+    total = 0
+
+    for path, label in zip(paths, labels):
+        try:
+            img = np.array(Image.open(path).convert("RGB").resize((IMAGE_SIZE, IMAGE_SIZE)))
+            corrupted = inject_salt_and_pepper_noise(img, intensity)
+            pil_img = Image.fromarray(corrupted)
+            tensor = transform(pil_img).unsqueeze(0).to(device)
+
+            logits = model(tensor)
+            pred = logits.argmax(dim=1).item()
+            if pred == label:
+                correct += 1
+            total += 1
+        except Exception:
+            continue
+
+    return correct / max(total, 1)
+
+
+def _collect_eval_sample(
+    loader,
+    sample_n: int,
+    seed: int = SEED,
+) -> Tuple[List[Path], List[int]]:
+    """Collect a deterministic evaluation subset from the test loader."""
+    all_paths, all_labels = [], []
+    for _, labels, paths in loader:
+        all_paths.extend(paths)
+        all_labels.extend(labels.tolist())
+        if len(all_paths) >= sample_n:
+            break
+
+    rng = np.random.default_rng(seed)
+    idx = rng.choice(len(all_paths), min(sample_n, len(all_paths)), replace=False)
+    sampled_paths = [Path(all_paths[i]) for i in idx]
+    sampled_labels = [all_labels[i] for i in idx]
+    return sampled_paths, sampled_labels
+
+
+def _save_robustness_metrics(experiment_name: str, results: Dict[str, float]) -> None:
+    """Persist robustness curves to a shared results JSON file."""
+    payload: Dict[str, object] = {}
+    if ROBUSTNESS_METRICS_JSON.exists():
+        try:
+            payload = json.loads(ROBUSTNESS_METRICS_JSON.read_text())
+        except json.JSONDecodeError:
+            payload = {}
+
+    payload[experiment_name] = results
+    ROBUSTNESS_METRICS_JSON.parent.mkdir(parents=True, exist_ok=True)
+    ROBUSTNESS_METRICS_JSON.write_text(json.dumps(payload, indent=2))
+
+
+def _plot_robustness_curve(
+    x_values: Sequence[float],
+    y_values: Sequence[float],
+    save_path: Path,
+    xlabel: str,
+    title: str,
+    color: str,
+) -> None:
+    """Plot and save a robustness curve."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(x_values, y_values, marker="o", linewidth=2, color=color, markersize=8)
+    ax.fill_between(x_values, y_values, alpha=0.15, color=color)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel("Accuracy")
+    ax.set_title(title)
+    ax.set_ylim(0, 1.05)
+    ax.grid(alpha=0.3)
+    ax.set_xticks(x_values)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
 def run_jpeg_robustness(
     model,
     loader,
@@ -101,24 +228,8 @@ def run_jpeg_robustness(
     save_path: Path = JPEG_ROBUSTNESS_PNG,
 ) -> Dict[int, float]:
     """Sample test-set images and evaluate accuracy at each JPEG quality."""
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
     transform = get_val_transform()
-
-    all_paths, all_labels = [], []
-    for _, labels, paths in loader:
-        all_paths.extend(paths)
-        all_labels.extend(labels.tolist())
-        if len(all_paths) >= sample_n:
-            break
-
-    rng = np.random.default_rng(SEED)
-    idx = rng.choice(len(all_paths), min(sample_n, len(all_paths)), replace=False)
-    sampled_paths = [Path(all_paths[i]) for i in idx]
-    sampled_labels = [all_labels[i] for i in idx]
+    sampled_paths, sampled_labels = _collect_eval_sample(loader, sample_n, seed=SEED)
 
     print(f"[StretchAgent] JPEG robustness test on {len(sampled_paths)} images ...")
     results: Dict[int, float] = {}
@@ -127,36 +238,73 @@ def run_jpeg_robustness(
         results[quality] = acc
         print(f"  Q={quality:3d} -> accuracy={acc:.4f}")
 
-    fig, ax = plt.subplots(figsize=(8, 5))
     qualities = sorted(results.keys(), reverse=True)
     accuracies = [results[q] for q in qualities]
-    ax.plot(qualities, accuracies, marker="o", linewidth=2, color="#1565C0", markersize=8)
-    ax.fill_between(qualities, accuracies, alpha=0.15, color="#1565C0")
-    ax.set_xlabel("JPEG Quality Level")
-    ax.set_ylabel("Accuracy")
-    ax.set_title("VIPER Robustness: Accuracy vs JPEG Compression Quality")
-    ax.set_xticks(qualities)
-    ax.set_ylim(0, 1.05)
-    ax.grid(alpha=0.3)
+    _save_robustness_metrics("jpeg_accuracy", {str(k): v for k, v in results.items()})
+    plot_rendered = True
+    try:
+        _plot_robustness_curve(
+            x_values=qualities,
+            y_values=accuracies,
+            save_path=save_path,
+            xlabel="JPEG Quality Level",
+            title="VIPER Robustness: Accuracy vs JPEG Compression Quality",
+            color="#1565C0",
+        )
+    except ModuleNotFoundError as exc:
+        plot_rendered = False
+        print(f"[StretchAgent] Could not render JPEG robustness plot: {exc}")
 
     diffs = [abs(accuracies[i] - accuracies[i + 1]) for i in range(len(accuracies) - 1)]
     if diffs:
         cliff_idx = int(np.argmax(diffs))
         cliff_q = qualities[cliff_idx + 1]
-        ax.axvline(cliff_q, color="red", linestyle="--", alpha=0.6)
-        ax.annotate(
-            f"Cliff @ Q={cliff_q}",
-            xy=(cliff_q, accuracies[cliff_idx + 1]),
-            xytext=(cliff_q + 2, accuracies[cliff_idx + 1] - 0.05),
-            fontsize=9,
-            color="red",
-        )
+        print(f"[StretchAgent] JPEG degradation cliff detected near Q={cliff_q}")
 
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(save_path, dpi=150)
-    plt.close(fig)
-    print(f"[StretchAgent] Saved JPEG robustness plot -> {save_path}")
+    if plot_rendered:
+        print(f"[StretchAgent] Saved JPEG robustness plot -> {save_path}")
+    print(f"[StretchAgent] Logged JPEG robustness metrics -> {ROBUSTNESS_METRICS_JSON}")
+    return results
+
+
+def run_salt_pepper_robustness(
+    model,
+    loader,
+    device: torch.device = DEVICE,
+    sample_n: int = STRETCH_SAMPLE_N,
+    noise_levels: Sequence[float] = SALT_PEPPER_NOISE_LEVELS,
+    save_path: Path = SALT_PEPPER_ROBUSTNESS_PNG,
+) -> Dict[float, float]:
+    """Evaluate accuracy degradation under increasing salt-and-pepper noise."""
+    transform = get_val_transform()
+    sampled_paths, sampled_labels = _collect_eval_sample(loader, sample_n, seed=SEED)
+
+    print(f"[StretchAgent] Salt-and-pepper robustness test on {len(sampled_paths)} images ...")
+    results: Dict[float, float] = {}
+    for intensity in noise_levels:
+        acc = evaluate_at_noise(model, sampled_paths, sampled_labels, intensity, device, transform)
+        results[float(intensity)] = acc
+        print(f"  noise={intensity:0.2f} -> accuracy={acc:.4f}")
+
+    ordered_levels = sorted(results.keys())
+    accuracies = [results[level] for level in ordered_levels]
+    _save_robustness_metrics("salt_pepper_accuracy", {f"{k:.2f}": v for k, v in results.items()})
+    plot_rendered = True
+    try:
+        _plot_robustness_curve(
+            x_values=ordered_levels,
+            y_values=accuracies,
+            save_path=save_path,
+            xlabel="Salt-and-Pepper Noise Intensity",
+            title="VIPER Robustness: Accuracy vs Salt-and-Pepper Noise",
+            color="#C62828",
+        )
+    except ModuleNotFoundError as exc:
+        plot_rendered = False
+        print(f"[StretchAgent] Could not render salt-and-pepper plot: {exc}")
+    if plot_rendered:
+        print(f"[StretchAgent] Saved salt-and-pepper robustness plot -> {save_path}")
+    print(f"[StretchAgent] Logged salt-and-pepper robustness metrics -> {ROBUSTNESS_METRICS_JSON}")
     return results
 
 
@@ -528,6 +676,13 @@ def run_stretch(checkpoint_path: Path = BEST_MODEL_PATH) -> None:
         run_jpeg_robustness(model, test_loader, DEVICE)
     except ModuleNotFoundError as exc:
         print(f"[StretchAgent] Skipping JPEG robustness because a dependency is missing: {exc}")
+    try:
+        run_salt_pepper_robustness(model, test_loader, DEVICE)
+    except ModuleNotFoundError as exc:
+        print(
+            "[StretchAgent] Skipping salt-and-pepper robustness because a dependency is missing: "
+            f"{exc}"
+        )
     run_wikiart_inference(model, device=DEVICE)
     print("[StretchAgent] All stretch goals complete.")
 
