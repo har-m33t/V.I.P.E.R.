@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.config import (
     AI_ART_DIR, REAL_ART_DIR, WIKIART_DIR,
     FEATURE_MATRIX_CSV, RESULTS_DIR,
-    EDA_KMEANS_K, EDA_SAMPLE_SIZE,
+    EDA_KMEANS_K, EDA_SAMPLE_SIZE, IMAGE_SIZE,
     LABEL_REAL, LABEL_AI,
 )
 
@@ -112,36 +112,41 @@ def fft_analysis(img_rgb: np.ndarray) -> Dict[str, float]:
 
 def compute_color_entropy(img_rgb: np.ndarray, k: int = EDA_KMEANS_K) -> Dict[str, float]:
     """
-    Estimate color palette entropy using KMeans clustering.
+    Estimate color palette entropy using KMeans clustering in CIELAB space.
 
-    Clusters pixels into k colour centres and computes Shannon entropy
-    of the cluster distribution. AI images often have artificially
-    smooth or over-saturated palettes.
+    Converts RGB pixels to Lab, clusters into k color centers, and computes
+    Shannon entropy of the cluster distribution.
 
     Args:
         img_rgb: H×W×3 uint8 numpy array.
-        k:       Number of colour clusters (default EDA_KMEANS_K=8).
+        k:       Number of color clusters (default EDA_KMEANS_K=8).
 
     Returns:
         Dict with keys: color_entropy, dominant_color_r/g/b, hue_std
 
-    AGENT_TASK: extend with Lab colour space analysis for richer palette insights
+    AGENT_TASK: extend with cross-image Lab consistency metrics
     """
-    pixels = img_rgb.reshape(-1, 3).astype(np.float32)
+    img_lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2LAB)
+    pixels_lab = img_lab.reshape(-1, 3).astype(np.float32)
 
     # Downsample for speed
-    if len(pixels) > 5000:
-        idx    = np.random.choice(len(pixels), 5000, replace=False)
-        pixels = pixels[idx]
+    if len(pixels_lab) > 5000:
+        idx = np.random.choice(len(pixels_lab), 5000, replace=False)
+        pixels_lab = pixels_lab[idx]
 
-    km = KMeans(n_clusters=k, n_init=5, random_state=42)
-    km.fit(pixels)
-    counts = np.bincount(km.labels_, minlength=k).astype(float)
-    probs  = counts / counts.sum()
-    probs  = probs[probs > 0]
+    k_eff = max(1, min(k, len(pixels_lab)))
+
+    km = KMeans(n_clusters=k_eff, n_init=5, random_state=42)
+    km.fit(pixels_lab)
+    counts = np.bincount(km.labels_, minlength=k_eff).astype(float)
+    probs = counts / counts.sum()
+    probs = probs[probs > 0]
     entropy = float(-np.sum(probs * np.log2(probs + 1e-10)))
 
-    dominant = km.cluster_centers_[np.argmax(counts)]
+    dominant_lab = np.clip(km.cluster_centers_[np.argmax(counts)], 0, 255).astype(np.uint8)
+    dominant_rgb = cv2.cvtColor(
+        dominant_lab.reshape(1, 1, 3), cv2.COLOR_LAB2RGB
+    )[0, 0].astype(np.float32)
 
     # Hue std via HSV
     img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
@@ -149,9 +154,9 @@ def compute_color_entropy(img_rgb: np.ndarray, k: int = EDA_KMEANS_K) -> Dict[st
 
     return {
         "color_entropy":    entropy,
-        "dominant_color_r": float(dominant[0]) / 255.0,
-        "dominant_color_g": float(dominant[1]) / 255.0,
-        "dominant_color_b": float(dominant[2]) / 255.0,
+        "dominant_color_r": float(dominant_rgb[0]) / 255.0,
+        "dominant_color_g": float(dominant_rgb[1]) / 255.0,
+        "dominant_color_b": float(dominant_rgb[2]) / 255.0,
         "hue_std":          hue_std,
     }
 
@@ -264,7 +269,7 @@ def edge_density(img_rgb: np.ndarray) -> Dict[str, float]:
 def extract_all_features(
     image_path: Path,
     label: int,
-    target_size: int = 224,
+    target_size: int = IMAGE_SIZE,
 ) -> Optional[Dict]:
     """
     Load image and run all six feature extractors.
