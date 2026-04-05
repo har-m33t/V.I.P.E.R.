@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIPER - Live Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;800&display=swap');
+
+        :root {
+            --bg-base: #09090b;
+            --surface: rgba(24, 24, 27, 0.6);
+            --surface-hover: rgba(39, 39, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #ef4444; /* Vivid Red */
+            --accent-glow: rgba(239, 68, 68, 0.3);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% -20%, var(--accent-glow) 0%, transparent 60%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media(min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Uploader Area */
+        .upload-panel {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px dashed var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+        }
+
+        .upload-panel:hover {
+            border-color: var(--accent);
+            background: var(--surface-hover);
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+
+        .upload-preview {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Forensic Card Area */
+        .report-card {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            opacity: 0.3; /* dim until upload */
+            transition: opacity 0.5s ease;
+            position: relative;
+        }
+
+        .report-card.active {
+            opacity: 1;
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 40px var(--accent-glow);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .badge {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 800;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .active .badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .prediction-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .label {
+            font-size: 14px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .confidence {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .evidence-box {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .evidence-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .evidence-item:last-child { margin-bottom: 0; }
+        
+        .evidence-item .check {
+            color: var(--accent);
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        .evidence-val {
+            color: white;
+            font-weight: 600;
+        }
+
+        .verdict {
+            margin-top: 20px;
+            padding: 16px;
+            text-align: center;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="font-weight: 800; font-size: 32px; margin-bottom: 40px; text-shadow: 0 0 20px var(--accent-glow);">VIPER Forensic Engine</h1>
+
+    <div class="container">
+        <!-- Interactive Upload Panel -->
+        <div class="upload-panel" id="dropzone" onclick="document.getElementById('file-input').click()">
+            <div class="upload-preview" id="preview"></div>
+            <div style="z-index: 10;" id="upload-content">
+                <div class="upload-icon">📸</div>
+                <h3 style="margin: 0 0 8px 0;">Select an Image</h3>
+                <p style="margin: 0; color: var(--text-dim); font-size: 14px;">Drag and drop or click to upload</p>
+            </div>
+            <input type="file" id="file-input" style="display: none;" accept="image/*">
+        </div>
+
+        <!-- The Forensic Report Card -->
+        <div class="report-card" id="report-card">
+            <div class="header">
+                <span class="title">🧾 Forensic Report Card</span>
+                <span class="badge" id="badge-alert">AI DETECTED</span>
+            </div>
+
+            <div class="prediction-row">
+                <div>
+                    <div class="label">Prediction</div>
+                    <div class="value" id="pred-text" style="color: var(--text-dim);">Awaiting Image</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="label">Confidence</div>
+                    <div class="confidence" id="conf-text">--%</div>
+                </div>
+            </div>
+
+            <div class="evidence-box">
+                <div class="label" style="margin-bottom: 15px; color: white;">Key Evidence</div>
+                
+                <div class="evidence-item">
+                    <span><span class="check">✔</span> FFT anomaly score</span>
+                    <span class="evidence-val" id="ev-fft">--</span>
+                </div>
+                <div class="evidence-item">
+                    <span><span class="check">✔</span> PRNU inconsistency</span>
+                    <span class="evidence-val" id="ev-prnu">--</span>
+                </div>
+                <div class="evidence-item">
+                    <span><span class="check">✔</span> LAB saturation</span>
+                    <span class="evidence-val" id="ev-lab">--</span>
+                </div>
+                <div class="evidence-item">
+                    <span><span class="check">✔</span> Grad-CAM focus</span>
+                    <span class="evidence-val" id="ev-cam">--</span>
+                </div>
+            </div>
+
+            <div class="verdict" id="verdict-banner" style="display: none;">
+                Final Verdict: Strong AI Likelihood
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('file-input');
+        const dropzone = document.getElementById('dropzone');
+        const preview = document.getElementById('preview');
+        const uploadContent = document.getElementById('upload-content');
+        const card = document.getElementById('report-card');
+
+        // Simulate Neural Network Analysis
+        function analyzeImage() {
+            // Re-hide fields for a quick "loading" flash effect
+            card.classList.remove('active');
+            document.getElementById('verdict-banner').style.display = "none";
+            document.getElementById('pred-text').innerText = "Analyzing...";
+            document.getElementById('conf-text').innerText = "--%";
+
+            setTimeout(() => {
+                // Flash the card Active
+                card.classList.add('active');
+                
+                // Populate the requested data dynamically
+                document.getElementById('pred-text').innerText = "AI / Real";
+                document.getElementById('pred-text').style.color = "white";
+                
+                document.getElementById('conf-text').innerText = "92%";
+                
+                document.getElementById('ev-fft').innerText = "High";
+                document.getElementById('ev-prnu').innerText = "Detected";
+                document.getElementById('ev-lab').innerText = "Elevated";
+                document.getElementById('ev-cam').innerText = "Facial texture regions";
+                
+                document.getElementById('verdict-banner').style.display = "block";
+            }, 800); // 800ms fake loading time
+        }
+
+        // Handle File Upload
+        input.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.style.opacity = '0.5';
+                    uploadContent.style.opacity = '0';
+                    analyzeImage();
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Drag and Drop Effects
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = "var(--accent)";
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.style.borderColor = "var(--border)";
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            input.files = e.dataTransfer.files;
+            input.dispatchEvent(new Event('change'));
+        });
+    </script>
+
+</body>
+</html>
