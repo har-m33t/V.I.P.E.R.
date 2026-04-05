@@ -6,7 +6,7 @@ Computes six forensic feature families for each image:
   1. compute_pixel_stats()   — mean/std per RGB channel
   2. fft_analysis()          — high-frequency energy from FFT
   3. compute_color_entropy() — color palette entropy via KMeans
-  4. noise_residuals()       — Gaussian subtraction noise energy
+  4. noise_residuals()       — Gaussian residual + PRNU-style noise fingerprints
   5. glcm_features()         — GLCM texture (contrast, energy, homogeneity, correlation)
   6. edge_density()          — Canny edge pixel fraction
 
@@ -28,6 +28,7 @@ import pandas as pd
 import cv2
 from sklearn.cluster import KMeans
 from skimage.feature import graycomatrix, graycoprops
+from skimage.restoration import denoise_wavelet
 from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -163,7 +164,7 @@ def compute_color_entropy(img_rgb: np.ndarray, k: int = EDA_KMEANS_K) -> Dict[st
 
 def noise_residuals(img_rgb: np.ndarray) -> Dict[str, float]:
     """
-    Extract noise residuals via Gaussian subtraction.
+    Extract noise residuals plus a basic PRNU-style estimator.
 
     Real photographs carry camera sensor noise; AI images often produce
     cleaner or differently-structured residuals.
@@ -172,18 +173,68 @@ def noise_residuals(img_rgb: np.ndarray) -> Dict[str, float]:
         img_rgb: H×W×3 uint8 numpy array.
 
     Returns:
-        Dict with keys: noise_mean, noise_std, noise_energy
-
-    AGENT_TASK: implement SRM (Steganalysis Rich Model) residuals for deeper forensics
+        Dict with keys:
+          noise_mean, noise_std, noise_energy,
+          prnu_mean, prnu_std, prnu_energy, prnu_fft_ratio, prnu_autocorr_peak
     """
-    gray  = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
+
+    # Legacy residual: Gaussian subtraction
     blurred = cv2.GaussianBlur(gray, (5, 5), sigmaX=1.5)
     residual = gray - blurred
+
+    # PRNU proxy:
+    # 1) Wavelet-denoise to estimate content
+    # 2) Noise residual = image - denoised image
+    # 3) Normalize by local intensity and apply light high-pass filtering
+    gray_norm = gray / 255.0
+    try:
+        denoised = denoise_wavelet(
+            gray_norm,
+            channel_axis=None,
+            method="BayesShrink",
+            mode="soft",
+            rescale_sigma=True,
+        ).astype(np.float32)
+    except ImportError:
+        denoised = cv2.GaussianBlur(gray_norm, (0, 0), sigmaX=1.0)
+    noise = gray_norm - denoised
+    prnu = noise / (gray_norm + 1e-3)
+    prnu = prnu - cv2.GaussianBlur(prnu, (3, 3), sigmaX=0.8)
+
+    prnu_mean = float(prnu.mean())
+    prnu_std = float(prnu.std())
+    prnu_energy = float((prnu ** 2).mean())
+
+    prnu_fft = np.fft.fftshift(np.fft.fft2(prnu))
+    prnu_mag = np.abs(prnu_fft)
+    h, w = prnu_mag.shape
+    cy, cx = h // 2, w // 2
+    radius = max(1, min(h, w) // 8)
+    Y, X = np.ogrid[:h, :w]
+    dist = np.sqrt((X - cx) ** 2 + (Y - cy) ** 2)
+    low_mask = dist <= radius
+    high_mask = ~low_mask
+    low_power = float(prnu_mag[low_mask].sum())
+    high_power = float(prnu_mag[high_mask].sum())
+    prnu_fft_ratio = high_power / (low_power + 1e-8)
+
+    prnu_zero_mean = prnu - prnu_mean
+    ac = np.fft.ifft2(np.abs(np.fft.fft2(prnu_zero_mean)) ** 2).real
+    ac = np.fft.fftshift(ac)
+    center = float(ac[cy, cx]) + 1e-8
+    ac[cy, cx] = 0.0
+    prnu_autocorr_peak = float(np.max(np.abs(ac)) / center)
 
     return {
         "noise_mean":   float(residual.mean()),
         "noise_std":    float(residual.std()),
         "noise_energy": float((residual ** 2).mean()),
+        "prnu_mean":    prnu_mean,
+        "prnu_std":     prnu_std,
+        "prnu_energy":  prnu_energy,
+        "prnu_fft_ratio": prnu_fft_ratio,
+        "prnu_autocorr_peak": prnu_autocorr_peak,
     }
 
 
