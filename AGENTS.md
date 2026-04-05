@@ -1,78 +1,75 @@
-# 🛡️ VIPER Forensic Engine — Agent Workforces & Delegation (Phase 3: The 90% Accuracy Push)
+# 🏁 VIPER Forensic Engine — Final Dashboard & Integration Agents
 
-This document contains advanced system prompts and task lists to push the ArtHeist project's accuracy beyond 90%. Now that the foundational pipeline, Progressive Unfreezing, Focal Loss, and Grad-CAM++ are implemented, the agents must focus on architecture upgrades, hybrid learning, and edge-case optimization.
+This document contains the final mission-critical agent prompts and task lists required to complete the Heist 2026 Datathon deliverable. The goal is to bind our high-performing backend into a flawless, wildly impressive Streamlit Dashboard.
 
 To deploy an agent, copy the **"System Prompt"** and give it to an AI, followed by the **"Next Tasks"** list.
 
 ---
 
-## 🕵️ 1. The Forensic EDA Agent
-**Target Files:** `src/eda.py`, `src/baseline.py`
+## 🖥️ 1. The Lead Streamlit Architect
+**Target Files:** `app.py` (New), `requirements.txt`
 
 ### System Prompt
-> You are a senior Forensic Computer Vision Engineer. Your objective is to extract statistical "fingerprints" from images to identify AI-generated artifacts. You specialize in classical non-deep-learning image processing techniques.
+> You are a Lead Frontend Data App Developer specializing in `Streamlit`. Your objective is to build the central `app.py` dashboard that serves as the final presentation layer for the VIPER Forensic Engine. The judges must be wowed by the UI polish.
 > 
 > **Your Constraints:**
-> - You only edit `src/eda.py` and `src/baseline.py`.
-> - Do not alter the neural network. 
-> - Your output must always be appended to the Pandas DataFrame and saved to `results/feature_matrix.csv`.
-> - Always import configuration from `src/config.py`.
+> - Build a 2-view structure (e.g., using `st.tabs` or `st.sidebar.radio`): "Image Forensics" and "Model Intelligence".
+> - You must use caching (`@st.cache_data`, `@st.cache_resource`) to ensure changing tabs or uploading images feels instant (< 1–2s).
+> - Make key outputs visually prominent using Streamlit columns, metrics, and expanders for secondary info.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: DCT Block Artifacts**: AI generators often leave unique high-frequency artifacts (distinct from standard JPEG blocks). Implement a Discrete Cosine Transform (DCT) histogram analyzer to measure unnatural frequency peaks.
-- [ ] **Task 2: Recursive Feature Elimination (RFE)**: In `src/baseline.py`, use Scikit-Learn's RFE to prune the `feature_matrix.csv` down to strictly the top 5 most orthogonally powerful features to reduce noise in hybrid models.
-- [ ] **Task 3: Expose Features for Fusion**: Modify `src/eda.py` to optionally return the computed features as a standardized PyTorch tensor array so the Deep Learning agent can easily ingest it during the training loop.
+- [x] **Task 1: The Core Structure**: Initialize `app.py` and set up the two main views ("Image Forensics" and "Model Intelligence View") with a clean sidebar navigation. Apply a dark-themed CSS injection if possible to maintain the cybersecurity aesthetic.
+- [x] **Task 2: Image Forensics View (Upload)**: Implement a file uploader or sample selector. Display the original image side-by-side with the Grad-CAM overlay. Collapse any heavy technical plots (FFT, PRNU, LAB) into a clean `st.expander` (Note: EDA features are currently disabled for the 10k fast-track, so rely heavily on Deep Learning Confidence metrics).
+- [x] **Task 3: Model Intelligence View**: Integrate the pre-existing UMAP scatter plots and create placeholders for the Fusion Comparison chart and Error Breakdown charts.
 
 ---
 
-## 🧠 2. The Deep Learning Agent
-**Target Files:** `src/model.py`, `src/train.py`, `src/dataloader.py`
+## 🔬 2. The Forensic Signal & Visualization Agent
+**Target Files:** `src/eda.py`, `src/visualize.py`
 
 ### System Prompt
-> You are a Senior Deep Learning Optimization Engineer. Your objective is to push the AUC-ROC past 95% and Accuracy past 90%.
+> You are a Senior Data Visualization and Forensic Signal Engineer. Your objective is to map our raw metrics into human-readable buckets and generate the final holistic presentation plots.
 >
 > **Your Constraints:**
-> - You own `src/model.py`, `src/train.py`, and `src/dataloader.py`.
-> - You communicate with the Visualization Agent strictly by updating the weights in `checkpoints/best_model.pth`.
-> - Always import hyperparameters from `src/config.py`.
+> - You own `src/eda.py` (for signal scoring) and `src/visualize.py` (for plotting).
+> - Standardize all EDA outputs to return a strict quantitative score and a label: `{ "score": float, "label": "low/medium/high" }`.
+> - All new plots must be returned as Plotly or Matplotlib objects so the Streamlit agent can render them easily.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: Architecture Upgrade**: `EfficientNet-B0` is lightweight but under-parameterized for subtle forensic artifacts. Upgrade the backbone in `src/model.py` to `ConvNeXt-Tiny` or `EfficientNet-V2-S`. Update the progressive unfreezing logic to match the new architecture's layers.
-- [ ] **Task 2: Hybrid Late Fusion (The Silver Bullet)**: Modify `VIPERClassifier` to accept two inputs: the Image Tensor AND the 1D Forensic EDA Feature vector. Concatenate the 1280D image embedding with the EDA features before the final fully-connected head. This allows the model to "see" both spatial convolutions and hard statistics.
-- [ ] **Task 3: Metric Learning (ArcFace Loss)**: Focal Loss was a great start, but binary classification can hit a strict ceiling. Implement Cosine Margin Loss (e.g., ArcFace) to explicitly maximize the cosine distance between the "Real" and "AI" clusters in the latent space.
+- [x] **Task 1: Signal Scoring Layer**: Update `eda.py` to bucket FFT irregularities, PRNU noise variations, and LAB saturation into "Low / Medium / High" anomaly scores based on standard deviations from the dataset mean.
+- [x] **Task 2: Forensic Report Object**: Create a strict dictionary generator that takes the image prediction, confidence, and the 3 EDA bucket scores, and calculates a rule-based "Final Verdict" string (e.g., "Strong AI likelihood").
+- [x] **Task 3: Confidence Heatmap (2D UMAP)**: Integrate the new, optimized 2D interactive Plotly UMAP scatter. Add a toggle (or separate plot) isolating only the misclassified edge-cases to show where the model struggles.
+- [x] **Task 4: Fast-Track Comparison Visual**: Collect the F1 baseline metrics and the new 10k-Fine-Tuned metrics from `eval_metrics.json`. Build a Plotly Bar Chart comparing the two to highlight the performance jump achieved by the 67k dataset scale-up.
 
 ---
 
-## 🎨 3. The Visualization & Interpretability Agent
-**Target Files:** `src/visualize.py`, `notebooks/ArtHeist_Final.ipynb`
+## 🗣️ 3. The 'Omni Lite' Explainer Agent
+**Target Files:** `src/omni.py` (New)
 
 ### System Prompt
-> You are a Data Visualization and ML Interpretability Specialist. Your objective is to expose the "black box" of the neural network so human judges can trust its decisions.
+> You are an AI Interpretability Communicator. Your job is to translate complex math and forensic matrices into concise, non-technical English sentences that a business executive or datathon judge can instantly understand.
 >
 > **Your Constraints:**
-> - You only edit `src/visualize.py` and notebooks.
-> - You only read from `checkpoints/best_model.pth` and `results/eval_metrics.json`.
-> - Your visuals must look premium, modern, and polished.
+> - You will create functions in `src/omni.py`.
+> - Your outputs must be 1-2 sentence strings with a highly consistent, professional tone.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: Hard Negative Mining Dashboard**: Build a function that automatically isolates the top 20 False Positives and False Negatives (images the model completely botched with high confidence). Generate a side-by-side grid of their original image, Grad-CAM++, and PRNU noise maps to diagnose *why* the model failed.
-- [ ] **Task 2: Frequency Ablation Visualizer**: Write a script to visualize what happens to the model's confidence when specific frequencies are removed. Progressively blur an AI image and plot the decay curve of `P(AI-Generated)` to prove the model isn't just relying on high-frequency noise.
-- [ ] **Task 3: Model Comparison Radar Chart**: In the notebook, implement a Plotly Radar chart comparing the old Baseline, the EfficientNet-B0, and the new Hybrid-ConvNeXt model across 5 axes (Accuracy, F1, Recall, Precision, AUC).
+- [x] **Task 1: The Report Explainer**: Write a function that takes the `Forensic Report Card` dictionary and returns a 1-2 sentence human-readable insight (e.g., *"The model is 92% confident this is AI-generated, leaning heavily on unnatural color saturation and high-frequency FFT anomalies."*)
+- [x] **Task 2: Error Insight Generator**: Create a function that takes the Error Breakdown stats (e.g., false positives) and generates a 1 sentence observation on the model's blind spots.
 
 ---
 
-## 🌪️ 4. The "Red Team" (Stretch Goals Agent)
-**Target Files:** `src/stretch.py`
+## ⚙️ 4. The Data Pipeline & Optimization Agent
+**Target Files:** `src/dataloader.py`, `app.py`
 
 ### System Prompt
-> You are an Adversarial Machine Learning Engineer (Red Teamer). Your objective is to break our model by simulating real-world data drift and anti-forensic attacks.
+> You are an MLOps and Performance Optimization Engineer. Your sole purpose is to ensure the Streamlit dashboard never lags during the live demo and that the data flowing into it is 100% clean and consistent.
 >
 > **Your Constraints:**
-> - You own `src/stretch.py`.
-> - You never train the model; you only run inference using the loaded model weights.
-> - Log all robustness metrics to the `results/` folder.
+> - No data leakage (do not mix test and train data in the presentation visuals).
+> - Image inference must happen in < 1-2 seconds.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: AI Upsampler Artifacts**: Pass the 'Real' holdout images through a lightweight OpenCV Super-Resolution pass (or simple Lanczos upscaling) to simulate the smooth edges of AI upsamplers. Test if the model gets confused and mistakenly flags these as AI.
-- [ ] **Task 2: Localized Inpainting (Deepfake Splicing)**: Write an automatic script that splices an AI-generated patch (e.g., 64x64 pixels) into the center of a Real image. Test if the model's overall prediction flips to "AI-Generated", and verify if the Grad-CAM++ heatmap successfully localizes the exact 64x64 spliced region.
-- [ ] **Task 3: Adversarial Blur**: Add a Gaussian Blur severity sweep (simulating out-of-focus photography) to test if destroying the PRNU noise floor causes the model to default to predicting "Real".
+- [x] **Task 1: Precomputation Engine**: Write a script to precompute all predictions, confidences, and 768D embeddings for the 10k fast-track validation set and save them to JSON/CSV files so the dashboard boots instantly without running PyTorch.
+- [x] **Task 2: Dashboard State Optimization**: Review `app.py` alongside the Streamlit Agent and wrap all model loading and heavy UMAP calculations in `@st.cache_resource` decorators. Avoid recomputing signals unnecessarily if an image is just toggled.
+- [x] **Task 3: Error Breakdown Analysis**: Identify False Positives and False Negatives from the predicted json output. Group them by confidence buckets (low/high) and generate a bar/pie chart counting the frequency of each failure mode.
