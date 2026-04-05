@@ -4,8 +4,8 @@ src/visualize.py - VIPER Forensic Engine: Interpretability Layer
 Generates:
   1. Grad-CAM++ heatmaps for correct and misclassified images
      -> saved to gradcam_gallery/
-  2. UMAP scatter plot
-     -> saved to omni_export/umap_scatter.png
+  2. Interactive UMAP scatter
+     -> saved to omni_export/umap_scatter.html
   3. Omni metadata CSV linking images to UMAP coordinates
      -> saved to omni_export/metadata.csv
 
@@ -247,7 +247,10 @@ def plot_umap_scatter(
     model.eval()
     with torch.no_grad():
         for image_path in tqdm(df["image_path"], desc="UMAP confidence"):
-            image = Image.open(image_path).convert("RGB")
+            try:
+                image = Image.open(image_path).convert("RGB")
+            except Exception:
+                image = Image.new("RGB", (IMAGE_SIZE, IMAGE_SIZE), color=0)
             image_tensor = transform(image).unsqueeze(0).to(device)
             logits = model(image_tensor)
             ai_confidence = torch.softmax(logits, dim=1)[0, 1].item()

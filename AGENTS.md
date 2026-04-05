@@ -36,8 +36,6 @@ To deploy an agent, simply copy the **"System Prompt"** and give it to an AI (li
 > - Always import hyperparameters (batch size, learning rate) from `src/config.py`.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: Progressive Unfreezing**: Modify `src/train.py` to implement a two-stage training loop. Train only the classifier head for the first 3 epochs, then unfreeze the top 3 MBConv blocks of EfficientNet for the remaining epochs with a 10x smaller learning rate.
-- [ ] **Task 2: Heavy Augmentation**: Enhance `src/dataloader.py` (collaborating with the Data agent if needed) to include random Gaussian Noise, JPEG compression drops, and RandomBrightnessContrast from Albumentations/Torchvision to make the model robust against adversarial filters.
 - [ ] **Task 3: Focal Loss**: Replace standard `BCEWithLogitsLoss` in `train.py` with Focal Loss to force the model to focus on the hardest-to-classify "borderline" images rather than easy ones.
 
 ---
@@ -54,8 +52,6 @@ To deploy an agent, simply copy the **"System Prompt"** and give it to an AI (li
 > - Your visuals must look premium, modern, and polished.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: Grad-CAM++**: Upgrade the traditional Grad-CAM implementation in `src/visualize.py` to use `GradCAMPlusPlus` (via the `pytorch-grad-cam` library) for sharper, more localized heatmaps of AI artifacts.
-- [ ] **Task 2: Interactive UMAP**: Right now, the UMAP scatter plot (`omni_export/umap_scatter.png`) is static. Rewrite that section to use `plotly.express` and export an interactive HTML file where hovering over a dot displays the actual image filename and its confidence score.
 - [ ] **Task 3: Notebook Assembly**: Update `notebooks/ArtHeist_Final.ipynb` and populate it with Markdown narrative, embedding your interactive Plotly graphs and a grid of the best Grad-CAM heatmaps.
 
 ---
@@ -72,6 +68,5 @@ To deploy an agent, simply copy the **"System Prompt"** and give it to an AI (li
 > - You must log all robustness metrics to the `results/` folder.
 
 ### Next Tasks to Execute
-- [ ] **Task 1: WikiArt Zero-Shot Test**: The Kaggle loader in `src/config.py` holds WikiArt credentials. Write a script to download a tiny subset (100 images) of WikiArt, push them through `src/stretch.py`, and measure the model's confidence distribution. Does the model think Rembrandt is an AI?
 - [ ] **Task 2: Adversarial Noise Sweep**: Expand the JPEG robustness test. Add a test that injects increasing levels of random salt-and-pepper noise and plots the degradation of Accuracy vs. Noise Intensity.
 - [ ] **Task 3: Export Omni Track Distillation**: Finalize the generation of the `omni_export/metadata.csv` to ensure it contains exactly the required columns for the datathon submission (filename, boolean label, model confidence score, top_extracted_feature_value).

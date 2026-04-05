@@ -21,6 +21,7 @@ from typing import Dict
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
@@ -40,6 +41,8 @@ import numpy as np
 
 HEAD_ONLY_EPOCHS = 3
 BACKBONE_LR_DIVISOR = 10.0
+FOCAL_GAMMA = 2.0
+FOCAL_ALPHA = None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -121,6 +124,35 @@ def build_stage_scheduler(
 ) -> CosineAnnealingLR:
     """Attach a cosine schedule sized to the current training stage."""
     return CosineAnnealingLR(optimizer, T_max=max(stage_epochs, 1), eta_min=1e-6)
+
+
+class FocalLoss(nn.Module):
+    """
+    Multi-class focal loss over class-index targets.
+
+    This keeps the existing two-logit classifier API intact while down-weighting
+    easy examples and emphasizing borderline mistakes.
+    """
+
+    def __init__(self, gamma: float = FOCAL_GAMMA, alpha: float | None = FOCAL_ALPHA):
+        super().__init__()
+        self.gamma = gamma
+        self.alpha = alpha
+
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        ce_loss = F.cross_entropy(logits, targets, reduction="none")
+        pt = torch.exp(-ce_loss)
+        focal_weight = (1.0 - pt) ** self.gamma
+
+        if self.alpha is not None:
+            alpha_t = torch.where(
+                targets == 1,
+                torch.full_like(ce_loss, self.alpha),
+                torch.full_like(ce_loss, 1.0 - self.alpha),
+            )
+            focal_weight = focal_weight * alpha_t
+
+        return (focal_weight * ce_loss).mean()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -244,6 +276,7 @@ def train(
     print(f"  Epochs   : {n_epochs}")
     print(f"  LR       : {lr}")
     print(f"  Batch    : {BATCH_SIZE}")
+    print(f"  Loss     : FocalLoss(gamma={FOCAL_GAMMA}, alpha={FOCAL_ALPHA})")
     print(f"  Stage 1  : classifier only for {min(HEAD_ONLY_EPOCHS, n_epochs)} epochs")
     print(f"  Stage 2  : last {UNFREEZE_BLOCKS} MBConv blocks @ {lr / BACKBONE_LR_DIVISOR:.2e}")
     print(f"{'='*60}\n")
@@ -253,7 +286,7 @@ def train(
 
     # ── Model + Loss + Optimizer + Scheduler ──────────────────────────────────
     model     = build_model(device)
-    criterion = nn.CrossEntropyLoss()
+    criterion = FocalLoss()
     head_only_epochs = min(HEAD_ONLY_EPOCHS, n_epochs)
     fine_tune_epochs = max(n_epochs - head_only_epochs, 0)
 
