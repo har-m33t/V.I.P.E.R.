@@ -1,12 +1,41 @@
+import { useEffect, useRef, useState } from 'react'
+import Dropzone from './components/Dropzone.jsx'
 import './App.css'
 
 function App() {
+  const [previewUrl, setPreviewUrl] = useState('')
+  const [fileName, setFileName] = useState('')
+  const previewRef = useRef('')
+
   const backendStatus = {
     ready: false,
-    detail: 'FastAPI integration will be connected in the next frontend step.',
+    detail: 'Upload interaction is live. FastAPI inference wiring comes next.',
     uses_eda_fusion: false,
     gradcam_available: false,
     checkpoint_loaded: false,
+  }
+
+  useEffect(() => {
+    return () => {
+      if (previewRef.current) {
+        URL.revokeObjectURL(previewRef.current)
+      }
+    }
+  }, [])
+
+  const handleFileSelected = (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return
+    }
+
+    if (previewRef.current) {
+      URL.revokeObjectURL(previewRef.current)
+    }
+
+    const nextPreview = URL.createObjectURL(file)
+    previewRef.current = nextPreview
+    setPreviewUrl(nextPreview)
+    setFileName(file.name)
   }
 
   return (
@@ -46,32 +75,25 @@ function App() {
             <p>{backendStatus.detail}</p>
           </div>
 
-          <div className="placeholder-panel">
-            <span className="panel-kicker">Upload Surface</span>
-            <h2>Dropzone interaction comes next.</h2>
-            <p>
-              This panel is reserved for image preview, drag-and-drop upload,
-              and upload telemetry.
-            </p>
-            <div className="placeholder-lines" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
+          <Dropzone
+            previewUrl={previewUrl}
+            fileName={fileName}
+            isAnalyzing={false}
+            onFileSelected={handleFileSelected}
+          />
 
           <div className="telemetry-strip">
             <div>
-              <span>Endpoint</span>
-              <strong>Pending</strong>
+              <span>Selection</span>
+              <strong>{fileName ? 'Captured' : 'Awaiting'}</strong>
             </div>
             <div>
-              <span>Checkpoint</span>
-              <strong>Pending</strong>
+              <span>Preview</span>
+              <strong>{previewUrl ? 'Ready' : 'Idle'}</strong>
             </div>
             <div>
               <span>Pipeline</span>
-              <strong>Pending</strong>
+              <strong>Frontend only</strong>
             </div>
           </div>
         </div>
@@ -79,10 +101,11 @@ function App() {
         <section className="report-card glass-panel">
           <div className="placeholder-panel">
             <span className="panel-kicker">Forensic Report Card</span>
-            <h2>Evidence panel framework is in place.</h2>
+            <h2>{fileName ? 'Image captured for analysis.' : 'Evidence panel framework is in place.'}</h2>
             <p>
-              The next feature commit will replace this placeholder with the
-              live upload and analysis interface.
+              {fileName
+                ? 'The next commit will connect this selected image to the backend and render the live forensic response here.'
+                : 'The next feature commit will replace this placeholder with the live upload and analysis interface.'}
             </p>
             <div className="placeholder-lines" aria-hidden="true">
               <span />
