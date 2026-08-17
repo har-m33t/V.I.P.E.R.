@@ -2,7 +2,7 @@
 src/visualize_comparison.py - VIPER vs Logistic Regression comparison visuals.
 
 This module builds presentation-ready comparison charts between the saved
-VIPERClassifier checkpoint and a reproducibly reconstructed Logistic Regression
+VIPERConvNeXt checkpoint and a reproducibly reconstructed Logistic Regression
 baseline on the same train/test split.
 
 Outputs:

@@ -4,10 +4,10 @@ src/visualize.py - VIPER Forensic Engine: Interpretability Layer
 Generates:
   1. Grad-CAM++ heatmaps for correct and misclassified images
      -> saved to gradcam_gallery/
-  2. Interactive UMAP scatter
-     -> saved to omni_export/umap_scatter.html
-  3. Omni metadata CSV linking images to UMAP coordinates
-     -> saved to omni_export/metadata.csv
+  2. Interactive UMAP scatter (full view + misclassified edge cases)
+     -> saved to results/umap_scatter.html
+  3. Baseline vs fine-tuned metric comparison
+     -> saved to results/fast_track_comparison.html
 
 Usage:
     python src/visualize.py
@@ -59,13 +59,12 @@ from src.config import (  # noqa: E402
     EVAL_METRICS_JSON,
     GRADCAM_DIR,
     IMAGE_SIZE,
-    OMNI_DIR,
-    OMNI_METADATA_CSV,
+    RESULTS_DIR,
     UMAP_FEATURES_CSV,
     UMAP_SCATTER_PNG,
 )
 from src.dataloader import get_dataloaders, get_val_transform  # noqa: E402
-from src.model import VIPERClassifier, load_checkpoint  # noqa: E402
+from src.model import VIPERConvNeXt, load_checkpoint  # noqa: E402
 
 
 class GradCAMPlusPlusEngine:
@@ -75,7 +74,7 @@ class GradCAMPlusPlusEngine:
     AGENT_TASK: add EigenCAM as a gradient-free alternative
     """
 
-    def __init__(self, model: VIPERClassifier, target_layer: torch.nn.Module):
+    def __init__(self, model: VIPERConvNeXt, target_layer: torch.nn.Module):
         if TorchGradCAMPlusPlus is None:
             raise ImportError(
                 "pytorch-grad-cam is required for Grad-CAM++ visualizations."
@@ -123,7 +122,7 @@ def overlay_heatmap(
 
 
 def generate_gradcam_gallery(
-    model: VIPERClassifier,
+    model: VIPERConvNeXt,
     loader,
     device: torch.device = DEVICE,
     n_correct: int = 20,
@@ -235,7 +234,7 @@ def _load_metric_json(path: Path) -> Dict[str, Any]:
 
 
 def _predict_umap_confidence(
-    model: VIPERClassifier,
+    model: VIPERConvNeXt,
     image_paths: Sequence[str],
     device: torch.device = DEVICE,
     batch_size: int = 32,
@@ -274,7 +273,7 @@ def _predict_umap_confidence(
 
 
 def prepare_umap_dataframe(
-    model: Optional[VIPERClassifier] = None,
+    model: Optional[VIPERConvNeXt] = None,
     umap_csv: Path = UMAP_FEATURES_CSV,
     device: torch.device = DEVICE,
     batch_size: int = 32,
@@ -464,7 +463,7 @@ def build_umap_scatter_figure(
 
 
 def plot_umap_scatter(
-    model: Optional[VIPERClassifier] = None,
+    model: Optional[VIPERConvNeXt] = None,
     umap_csv: Path = UMAP_FEATURES_CSV,
     save_png: Path = UMAP_SCATTER_PNG,
     save_html: Optional[Path] = None,
@@ -579,40 +578,12 @@ def plot_fast_track_comparison(
     return fig
 
 
-def build_omni_metadata(
-    umap_csv: Path = UMAP_FEATURES_CSV,
-    gradcam_dir: Path = GRADCAM_DIR,
-    output_csv: Path = OMNI_METADATA_CSV,
-    prepared_df: Optional[pd.DataFrame] = None,
-) -> pd.DataFrame:
-    """
-    Build the Omni metadata CSV linking UMAP points to Grad-CAM files and scores.
-    """
-    if prepared_df is not None:
-        df = prepared_df.copy()
-    elif umap_csv.exists():
-        df = pd.read_csv(umap_csv)
-    else:
-        return pd.DataFrame()
-
-    gradcam_files = sorted(gradcam_dir.glob("*.png"))
-    gradcam_map = {f.stem: str(f) for f in gradcam_files}
-    df["gradcam_path"] = df["image_path"].apply(lambda p: gradcam_map.get(Path(p).stem, ""))
-
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_csv, index=False)
-    print(f"[VizAgent] Omni metadata -> {output_csv} ({len(df)} rows)")
-    return df
-
-
 def visualize(checkpoint_path: Path = BEST_MODEL_PATH) -> None:
     """Run the full visualization pipeline."""
     model = load_checkpoint(checkpoint_path, DEVICE)
     if model is None:
         GRADCAM_DIR.mkdir(parents=True, exist_ok=True)
-        OMNI_DIR.mkdir(parents=True, exist_ok=True)
         (GRADCAM_DIR / ".placeholder").touch()
-        (OMNI_DIR / ".placeholder").touch()
         print("[VizAgent] No checkpoint found. Created placeholder files.")
         return
 
@@ -627,8 +598,7 @@ def visualize(checkpoint_path: Path = BEST_MODEL_PATH) -> None:
         prepared_df=umap_df,
         edge_cases_only=True,
     )
-    build_omni_metadata(prepared_df=umap_df)
-    plot_fast_track_comparison(save_html=OMNI_DIR / "fast_track_comparison.html")
+    plot_fast_track_comparison(save_html=RESULTS_DIR / "fast_track_comparison.html")
 
     print("[VizAgent] Visualization complete.")
 
