@@ -18,7 +18,9 @@ env/
 .idea/
 *.swp
 *~
-node_modules/
+
+# Agent instructions, plans, and outlines (local working notes)
+.claude/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -32,22 +34,28 @@ data/wikiart/
 data/Art/
 data/ai_art_classification/
 
-# Model checkpoints (binary, large)
-checkpoints/*.pth
-checkpoints/*.pt
+# Model weights are published as GitHub Release assets, not committed:
+# every checkpoint exceeds GitHub's hard 100 MB per-file limit.
+# checkpoints/SHA256SUMS and checkpoints/MODEL_CARD.md are tracked instead.
+*.pth
+*.pt
 checkpoints/torchvision_weights/
 
-# Generated outputs (reproducible)
-results/*.json
-results/*.png
-results/*.csv
+# Results ARE published: metrics, per-sample scores and charts are the
+# evidence behind every number in the README, so they are tracked on purpose.
+# Only the reproducible-but-bulky UMAP coordinate dump stays out.
+results/umap_features.csv
 gradcam_gallery/*.png
 gradcam_gallery/*.jpg
-omni_export/*.png
-omni_export/*.csv
+
+# Training logs are tracked (raw evidence for the metrics); pod plumbing
+# logs are not.
+results/**/chain*.log
+results/**/canon*.log
+results/**/setup.log
+results/run_full.log
 
 # OS
 .DS_Store
 Thumbs.db
 desktop.ini
-*.log
