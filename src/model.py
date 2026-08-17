@@ -1,9 +1,9 @@
 """
 src/model.py - VIPER Forensic Engine: ConvNeXt-Tiny Architecture
 
-Phase 3.1 upgrades the image backbone from EfficientNet-B0 to ConvNeXt-Tiny.
-The model also exposes an optional late-fusion path for Phase 3.2, but that
-path is only active when a non-zero EDA feature dimension is provided.
+The image backbone is ConvNeXt-Tiny. An optional late-fusion path adds the
+forensic feature vector to the head; it is only active when a non-zero EDA
+feature dimension is provided, which is what makes a model a VIPER variant.
 """
 
 import sys
@@ -29,7 +29,7 @@ from src.config import (
 )
 
 
-class VIPERClassifier(nn.Module):
+class VIPERConvNeXt(nn.Module):
     """
     ConvNeXt-Tiny binary classifier for AI-generated image detection.
 
@@ -105,15 +105,57 @@ class VIPERClassifier(nn.Module):
 
         Stage groups include each stage's downsampling transition so the
         trainable boundary remains coherent.
+
+        `n_stages == 0` means a fully frozen feature extractor. That case needs
+        two guards: `lst[-0:]` is the whole list rather than the empty slice,
+        which would silently unfreeze everything; and the final LayerNorm has to
+        be frozen too, or 1,536 parameters of the representation still adapt.
         """
         n_stages = max(0, min(int(n_stages), len(self._stage_groups)))
-        for stage_group in self._stage_groups[-n_stages:]:
+        self.frozen_backbone = n_stages == 0
+
+        # Re-freeze first. Without this the method only ever adds trainable
+        # parameters, so lowering n_stages after __init__ silently leaves the
+        # previously-unfrozen stages trainable.
+        for param in self.backbone.features.parameters():
+            param.requires_grad = False
+        for param in self.embedding_norm.parameters():
+            param.requires_grad = not self.frozen_backbone
+
+        for stage_group in (self._stage_groups[-n_stages:] if n_stages else []):
             for module in stage_group:
                 for param in module.parameters():
                     param.requires_grad = True
 
         for param in self.head.parameters():
             param.requires_grad = True
+
+    def train(self, mode: bool = True):
+        """Hold a frozen backbone in eval mode.
+
+        ConvNeXt's stochastic-depth layers stay active in train mode. On a
+        frozen extractor that injects noise into features nothing can adapt to,
+        so the head would be fitting a moving target for no reason.
+        """
+        super().train(mode)
+        if getattr(self, "frozen_backbone", False):
+            self.backbone.eval()
+            self.embedding_norm.eval()
+        return self
+
+    def variant_name(self) -> str:
+        """The canonical VIPER variant name for this configuration.
+
+        Format: VIPER-<backbone>-<Frozen|Unfrozen>-<head>. The "VIPER" prefix is
+        reserved for configurations that actually fuse forensic features with
+        the backbone; without that branch this is a plain backbone baseline and
+        is named as one, so the two never get conflated in a results table.
+        """
+        state = "Frozen" if getattr(self, "frozen_backbone", False) else "Unfrozen"
+        head = "MLP" if self.eda_feature_dim > 0 or len(self.head) > 2 else "Linear"
+        if self.eda_feature_dim > 0:
+            return f"VIPER-ConvNeXt-{state}-{head}"
+        return f"ConvNeXt-{state}-{head} (no forensic)"
 
     def _extract_image_embedding(self, x: torch.Tensor) -> torch.Tensor:
         features = self.backbone.features(x)
@@ -185,16 +227,16 @@ def build_model(
     device: torch.device = DEVICE,
     eda_feature_dim: int = 0,
     pretrained: bool = True,
-) -> VIPERClassifier:
+) -> VIPERConvNeXt:
     """
-    Build and return a VIPERClassifier ready for training or inference.
+    Build and return a VIPERConvNeXt ready for training or inference.
     """
-    model = VIPERClassifier(
+    model = VIPERConvNeXt(
         eda_feature_dim=eda_feature_dim,
         pretrained=pretrained,
     ).to(device)
     trainable, total = model.count_trainable_params()
-    print(f"[DLAgent] VIPERClassifier built:")
+    print(f"[DLAgent] VIPERConvNeXt built:")
     print(f"          Backbone         : {MODEL_NAME}")
     print(f"          Pretrained       : {model.using_pretrained_backbone}")
     print(f"          EDA feature dim  : {eda_feature_dim}")
@@ -206,7 +248,7 @@ def build_model(
 def load_checkpoint(
     checkpoint_path: Path = BEST_MODEL_PATH,
     device: torch.device = DEVICE,
-) -> Optional[VIPERClassifier]:
+) -> Optional[VIPERConvNeXt]:
     """
     Load a saved model checkpoint.
     """
