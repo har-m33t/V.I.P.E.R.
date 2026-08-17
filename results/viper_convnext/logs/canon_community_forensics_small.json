@@ -1,0 +1,1684 @@
+{
+  "dataset": "community_forensics_small",
+  "n_shards": 186,
+  "n_images": 556541,
+  "n_failed": 0,
+  "wall_seconds": 1508.0,
+  "canon_version": "canon-v1:crop256-jpeg95-noexif",
+  "shards": [
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_0.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_0.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 75.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_1.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_1.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 77.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_10.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_10.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 58.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_104.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_104.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 449.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_100.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_100.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 452.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_102.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_102.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 467.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_105.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_105.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 473.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_101.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_101.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 475.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_11.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_11.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 78.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_103.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_103.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 488.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_106.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_106.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 115.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_107.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_107.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 116.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_108.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_108.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 116.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_109.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_109.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 118.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_110.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_110.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 115.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_111.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_111.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 115.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_117.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_117.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_118.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_118.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_119.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_119.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_12.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_12.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 25.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_120.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_120.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_116.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_116.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 70.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_121.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_121.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_122.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_122.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_123.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_123.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_124.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_124.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_125.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_125.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_112.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_112.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 113.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_113.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_113.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 112.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_126.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_126.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_127.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_127.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_128.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_128.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_129.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_129.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_130.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_130.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_131.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_131.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_132.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_132.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_133.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_133.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_134.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_134.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_135.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_135.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_136.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_136.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_137.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_137.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_13.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_13.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 25.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_138.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_138.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_139.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_139.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_140.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_140.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_142.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_142.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_141.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_141.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_143.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_143.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_144.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_144.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_145.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_145.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_146.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_146.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_148.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_148.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_147.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_147.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_14.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_14.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 26.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_149.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_149.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_150.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_150.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_115.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_115.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 147.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_151.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_151.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_152.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_152.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 7.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_153.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_153.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 6.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_154.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_154.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 8.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_155.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_155.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 10.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_15.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_15.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 28.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_156.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_156.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_157.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_157.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_158.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_158.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_16.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_16.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_159.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_159.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_160.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_160.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_161.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_161.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_162.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_162.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_163.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_163.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_164.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_164.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_114.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_114.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 244.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_165.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_165.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_166.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_166.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_167.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_167.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 36.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_168.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_168.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_169.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_169.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 34.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_17.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_17.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_170.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_170.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_171.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_171.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 36.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_172.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_172.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_173.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_173.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_174.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_174.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_175.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_175.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_176.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_176.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_18.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_18.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_177.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_177.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 37.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_178.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_178.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_179.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_179.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 36.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_180.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_180.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 37.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_181.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_181.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_182.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_182.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_19.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_19.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 26.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_183.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_183.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 36.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_184.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_184.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 36.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_185.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_185.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 35.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_2.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_2.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_20.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_20.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 28.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_21.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_21.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_22.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_22.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_23.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_23.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_24.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_24.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_25.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_25.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_26.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_26.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 26.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_27.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_27.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_28.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_28.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_29.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_29.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_3.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_3.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 28.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_31.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_31.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_30.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_30.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_32.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_32.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_33.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_33.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_34.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_34.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_35.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_35.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_36.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_36.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_37.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_37.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_38.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_38.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_39.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_39.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_4.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_4.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_40.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_40.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_41.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_41.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_42.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_42.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_43.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_43.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_44.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_44.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_45.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_45.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_46.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_46.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_47.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_47.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_48.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_48.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_49.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_49.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_5.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_5.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 26.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_50.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_50.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 28.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_51.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_51.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_52.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_52.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_53.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_53.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_54.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_54.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_55.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_55.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_56.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_56.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_57.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_57.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_58.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_58.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_59.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_59.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_6.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_6.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 28.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_60.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_60.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_61.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_61.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_62.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_62.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_68.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_68.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 9.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_63.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_63.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_64.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_64.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_66.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_66.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 25.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_65.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_65.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 27.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_71.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_71.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 8.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_70.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_70.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 11.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_69.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_69.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_72.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_72.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 15.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_73.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_73.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 10.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_7.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_7.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 27.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_78.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_78.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 3.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_67.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_67.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 52.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_77.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_77.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 14.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_79.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_79.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 14.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_76.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_76.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 33.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_8.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_8.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 26.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_82.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_82.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 8.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_74.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_74.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 50.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_80.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_80.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 28.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_81.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_81.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 22.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_87.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_87.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 20.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_84.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_84.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 30.0,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_85.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_85.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 29.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_86.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_86.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 29.4,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_83.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_83.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 45.9,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_88.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_88.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 21.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_89.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_89.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 20.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_75.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_75.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 96.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_90.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_90.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 22.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_9.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_9.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2993,
+      "n_failed": 0,
+      "seconds": 28.7,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_91.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_91.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.3,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_92.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_92.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 26.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_93.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_93.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 101.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_94.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_94.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 106.6,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_95.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_95.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 106.8,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_96.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_96.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 105.2,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_97.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_97.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 102.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_98.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_98.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 101.5,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    },
+    {
+      "src": "/data/raw/community_forensics_small/data/HFCF_small_99.parquet",
+      "out": "/data/proc/community_forensics_small/HFCF_small_99.parquet",
+      "dataset": "community_forensics_small",
+      "n_rows": 2992,
+      "n_failed": 0,
+      "seconds": 96.1,
+      "canon_version": "canon-v1:crop256-jpeg95-noexif"
+    }
+  ]
+}

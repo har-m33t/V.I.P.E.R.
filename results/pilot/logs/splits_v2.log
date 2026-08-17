@@ -1,0 +1,20 @@
+[s45] reading metadata from 186 shards ...
+[s45] 556,541 rows
+[s45] deduplicating (phash, hamming<=4) ...
+[s45] dropped 3,167 duplicates (0.57%)
+        community_forensics_small <-> community_forensics_small: 3,167
+[s45] genuine Commercial-subset generators: 0
+[s45] LOGO families: {'gan': ['GigaGAN', 'BigGAN', 'StyleGAN2'], 'sd1x': ['tftgregrge/mpid-hassanblend-v1-5-better-train-3000', 'FloydianSound/Redline_Diffusion_V1-5', 'FloydianSound/Aoi_Ogata_Artstyle_v1-5'], 'modern_open': ['StyleGANXL', 'StyleSANXL', 'Charles-Elena/playground-v2-1024px-aesthetic-ce']}
+[s45] WARNING: required families absent from this corpus: ['commercial'] — cross-generator results cannot speak to them.
+[s45] per-generator cap 4,655 (2%) -> removed 3,609
+[s45] train balanced to 194,023 per class
+[s45] ASSERTIONS PASSED: zero fake-generator overlap across train/val/logo; both eval splits carry negatives
+{
+  "train": 388046,
+  "balanced_out": 750,
+  "val": 75960,
+  "dropped_dup": 3167,
+  "logo": 85009,
+  "capped_out": 3609
+}
+[s45] manifest -> /data/manifest/manifest_cfsmall_v2.parquet

@@ -1,0 +1,27 @@
+[fusion] loaded forensic features: 160,000 uids x 33 dims
+[fusion] train: 80,000
+[fusion] val: 40,000
+[fusion] logo: 40,000
+[fusion] forensic features: 33 dims, standardized on train (n=80,000)
+Downloading: "https://download.pytorch.org/models/convnext_tiny-983f1562.pth" to /root/.cache/torch/hub/checkpoints/convnext_tiny-983f1562.pth
+  0%|          | 0.00/109M [00:00<?, ?B/s]  1%|          | 640k/109M [00:00<00:18, 6.29MB/s] 10%|█         | 11.0M/109M [00:00<00:01, 65.5MB/s] 27%|██▋       | 29.8M/109M [00:00<00:00, 116MB/s]  38%|███▊      | 41.8M/109M [00:00<00:00, 117MB/s] 49%|████▊     | 53.1M/109M [00:00<00:00, 115MB/s] 59%|█████▊    | 64.0M/109M [00:00<00:00, 109MB/s] 73%|███████▎  | 79.1M/109M [00:00<00:00, 124MB/s] 85%|████████▌ | 93.2M/109M [00:00<00:00, 132MB/s] 97%|█████████▋| 106M/109M [00:01<00:00, 56.9MB/s]100%|██████████| 109M/109M [00:01<00:00, 80.9MB/s]
+[fusion] ConvNeXt-Tiny trainable 26,893,826/28,128,866
+[fusion] ep01 loss=0.1214 val_auc=0.9927 LOGO_auc=0.9627 [2.0min 670 img/s]
+[fusion] ep02 loss=0.0542 val_auc=0.9949 LOGO_auc=0.9822 [1.5min 874 img/s]
+[fusion] ep03 loss=0.0337 val_auc=0.9960 LOGO_auc=0.9760 [1.5min 876 img/s]
+[fusion] ep04 loss=0.0235 val_auc=0.9950 LOGO_auc=0.9737 [1.5min 888 img/s]
+[fusion] ep05 loss=0.0156 val_auc=0.9948 LOGO_auc=0.9589 [1.5min 886 img/s]
+[fusion] ep06 loss=0.0122 val_auc=0.9964 LOGO_auc=0.9718 [1.5min 891 img/s]
+[fusion] early stop ep6 (best ep2)
+{
+  "val": {
+    "auc": 0.9949286317846273,
+    "ap": 0.994584761255735,
+    "n": 40000
+  },
+  "logo": {
+    "auc": 0.9822425801812091,
+    "ap": 0.983605122704788,
+    "n": 40000
+  }
+}

@@ -1,0 +1,122 @@
+[viper] loaded forensic features: 160,000 uids x 33 dims
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] forensic features: 33 dims, standardized on train (n=80,000)
+[viper] VIPER-ConvNeXt-Unfrozen-MLP: trainable 26,893,826/28,128,866 unfreeze_stages=2 head=mlp feat_dim=33 lr=0.0001
+[viper] ep01 loss=0.1229 val_auc=0.9938 LOGO_auc=0.9603 [1.3min 1020 img/s]
+[viper] ep02 loss=0.0571 val_auc=0.9945 LOGO_auc=0.9725 [1.0min 1277 img/s]
+[viper] ep03 loss=0.0346 val_auc=0.9961 LOGO_auc=0.9768 [1.0min 1270 img/s]
+[viper] ep04 loss=0.0247 val_auc=0.9936 LOGO_auc=0.9706 [1.0min 1283 img/s]
+[viper] ep05 loss=0.0167 val_auc=0.9966 LOGO_auc=0.9756 [1.0min 1286 img/s]
+[viper] ep06 loss=0.0121 val_auc=0.9975 LOGO_auc=0.9820 [1.0min 1288 img/s]
+[viper] ep07 loss=0.0082 val_auc=0.9966 LOGO_auc=0.9753 [1.0min 1313 img/s]
+[viper] ep08 loss=0.0055 val_auc=0.9970 LOGO_auc=0.9686 [1.0min 1312 img/s]
+[viper] ep09 loss=0.0039 val_auc=0.9973 LOGO_auc=0.9809 [1.0min 1329 img/s]
+[viper] ep10 loss=0.0030 val_auc=0.9971 LOGO_auc=0.9839 [1.0min 1289 img/s]
+[viper] ep11 loss=0.0021 val_auc=0.9976 LOGO_auc=0.9838 [1.1min 1255 img/s]
+[viper] ep12 loss=0.0016 val_auc=0.9975 LOGO_auc=0.9850 [1.0min 1275 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.997537683548346,
+    "ap": 0.9972721887050938,
+    "brier": 0.019863037503016313,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.9774,
+      "balanced_accuracy": 0.9760908697131285,
+      "precision_ai": 0.9873546923731217,
+      "recall_ai": 0.9623611341402752,
+      "f1_ai": 0.9746977160770264,
+      "precision_real": 0.969550637156271,
+      "recall_real": 0.9898206052859817,
+      "f1_real": 0.9795807734007951,
+      "f1_macro": 0.9771392447389107,
+      "mcc": 0.9545406126182125,
+      "fpr": 0.010179394714018351,
+      "fnr": 0.03763886585972476,
+      "confusion": {
+        "tn": 21684,
+        "fp": 223,
+        "fn": 681,
+        "tp": 17412
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.2934044897556305,
+      "accuracy": 0.9783,
+      "balanced_accuracy": 0.977321480461497,
+      "precision_ai": 0.9846924418931847,
+      "recall_ai": 0.9670590836235008,
+      "f1_ai": 0.9757961073002064,
+      "precision_real": 0.9731905897170617,
+      "recall_real": 0.9875838772994933,
+      "f1_real": 0.9803344057274911,
+      "f1_macro": 0.9780652565138488,
+      "mcc": 0.9562616239891151,
+      "fpr": 0.012416122700506687,
+      "fnr": 0.0329409163764992,
+      "confusion": {
+        "tn": 21635,
+        "fp": 272,
+        "fn": 596,
+        "tp": 17497
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.9849609279628597,
+    "ap": 0.9866669646299822,
+    "brier": 0.09713217287739659,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.891525,
+      "balanced_accuracy": 0.8948765293329034,
+      "precision_ai": 0.9888855691664177,
+      "recall_ai": 0.7993913631533185,
+      "f1_ai": 0.8840986190132757,
+      "precision_real": 0.821491510853213,
+      "recall_real": 0.9903616955124883,
+      "f1_real": 0.8980569978619928,
+      "f1_macro": 0.8910778084376343,
+      "mcc": 0.7999986110101497,
+      "fpr": 0.00963830448751166,
+      "fnr": 0.20060863684668148,
+      "confusion": {
+        "tn": 19112,
+        "fp": 186,
+        "fn": 4153,
+        "tp": 16549
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.0003920417802873999,
+      "accuracy": 0.937775,
+      "balanced_accuracy": 0.9373652608750507,
+      "precision_ai": 0.9319766614486978,
+      "recall_ai": 0.9490387402183363,
+      "f1_ai": 0.9404303185506067,
+      "precision_real": 0.944235953274486,
+      "recall_real": 0.9256917815317649,
+      "f1_real": 0.9348719156396368,
+      "f1_macro": 0.9376511170951217,
+      "mcc": 0.8754712546056731,
+      "fpr": 0.07430821846823506,
+      "fnr": 0.05096125978166361,
+      "confusion": {
+        "tn": 17864,
+        "fp": 1434,
+        "fn": 1055,
+        "tp": 19647
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+[s6b] train: 80,000
+[s6b] val: 40,000
+[s6b] logo: 40,000
+[s6b] ConvNeXt-Tiny trainable 26,586,626/27,821,666
+[s6b] ep01 loss=0.1246 val_auc=0.9947 LOGO_auc=0.9674 [1.5min 885 img/s]
+[s6b] ep02 loss=0.0542 val_auc=0.9948 LOGO_auc=0.9723 [1.1min 1262 img/s]
+[s6b] ep03 loss=0.0335 val_auc=0.9948 LOGO_auc=0.9740 [1.0min 1276 img/s]
+[s6b] ep04 loss=0.0241 val_auc=0.9957 LOGO_auc=0.9768 [1.0min 1284 img/s]
+[s6b] ep05 loss=0.0158 val_auc=0.9966 LOGO_auc=0.9836 [1.0min 1294 img/s]
+[s6b] ep06 loss=0.0125 val_auc=0.9957 LOGO_auc=0.9699 [1.0min 1292 img/s]
+[s6b] ep07 loss=0.0077 val_auc=0.9964 LOGO_auc=0.9828 [1.1min 1245 img/s]
+[s6b] ep08 loss=0.0052 val_auc=0.9961 LOGO_auc=0.9823 [1.1min 1247 img/s]
+[s6b] ep09 loss=0.0040 val_auc=0.9961 LOGO_auc=0.9854 [1.1min 1255 img/s]
+[s6b] ep10 loss=0.0029 val_auc=0.9971 LOGO_auc=0.9827 [1.1min 1262 img/s]
+[s6b] ep11 loss=0.0017 val_auc=0.9971 LOGO_auc=0.9841 [1.1min 1252 img/s]
+[s6b] ep12 loss=0.0017 val_auc=0.9971 LOGO_auc=0.9849 [1.1min 1255 img/s]
+{
+  "val": {
+    "auc": 0.9961479221120015,
+    "ap": 0.9958766448472312,
+    "n": 40000
+  },
+  "logo": {
+    "auc": 0.9853543614268214,
+    "ap": 0.9870616139140798,
+    "n": 40000
+  }
+}

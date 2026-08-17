@@ -1,0 +1,120 @@
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] ConvNeXt-Unfrozen-Linear (no forensic): trainable 26,586,626/27,821,666 unfreeze_stages=2 head=linear feat_dim=0 lr=0.0001
+[viper] ep01 loss=0.1245 val_auc=0.9910 LOGO_auc=0.9607 [1.3min 1061 img/s]
+[viper] ep02 loss=0.0536 val_auc=0.9954 LOGO_auc=0.9689 [1.0min 1330 img/s]
+[viper] ep03 loss=0.0357 val_auc=0.9949 LOGO_auc=0.9597 [1.0min 1348 img/s]
+[viper] ep04 loss=0.0235 val_auc=0.9971 LOGO_auc=0.9704 [1.0min 1348 img/s]
+[viper] ep05 loss=0.0168 val_auc=0.9965 LOGO_auc=0.9700 [1.0min 1335 img/s]
+[viper] ep06 loss=0.0120 val_auc=0.9968 LOGO_auc=0.9782 [1.0min 1348 img/s]
+[viper] ep07 loss=0.0092 val_auc=0.9957 LOGO_auc=0.9784 [1.0min 1351 img/s]
+[viper] ep08 loss=0.0057 val_auc=0.9971 LOGO_auc=0.9825 [1.0min 1347 img/s]
+[viper] ep09 loss=0.0039 val_auc=0.9969 LOGO_auc=0.9820 [1.0min 1350 img/s]
+[viper] ep10 loss=0.0026 val_auc=0.9967 LOGO_auc=0.9867 [1.0min 1345 img/s]
+[viper] ep11 loss=0.0019 val_auc=0.9970 LOGO_auc=0.9853 [1.0min 1363 img/s]
+[viper] ep12 loss=0.0017 val_auc=0.9970 LOGO_auc=0.9849 [1.0min 1358 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.9967189171331836,
+    "ap": 0.9964704268762535,
+    "brier": 0.02157458824975208,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.9753,
+      "balanced_accuracy": 0.9746644209797288,
+      "precision_ai": 0.9771801595715003,
+      "recall_ai": 0.9679986735201459,
+      "f1_ai": 0.9725677476677033,
+      "precision_real": 0.973773610544911,
+      "recall_real": 0.9813301684393116,
+      "f1_real": 0.9775372862859222,
+      "f1_macro": 0.9750525169768127,
+      "mcc": 0.9501409586696034,
+      "fpr": 0.018669831560688365,
+      "fnr": 0.03200132647985409,
+      "confusion": {
+        "tn": 21498,
+        "fp": 409,
+        "fn": 579,
+        "tp": 17514
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.502685546875,
+      "accuracy": 0.975325,
+      "balanced_accuracy": 0.9746872447346929,
+      "precision_ai": 0.9772346836290593,
+      "recall_ai": 0.9679986735201459,
+      "f1_ai": 0.972594752186589,
+      "precision_real": 0.9737747984418879,
+      "recall_real": 0.98137581594924,
+      "f1_real": 0.9775605319995453,
+      "f1_macro": 0.9750776420930671,
+      "mcc": 0.9501916341042214,
+      "fpr": 0.01862418405076003,
+      "fnr": 0.03200132647985409,
+      "confusion": {
+        "tn": 21499,
+        "fp": 408,
+        "fn": 579,
+        "tp": 17514
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.9867270150498116,
+    "ap": 0.9878460696882652,
+    "brier": 0.07073795324953126,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.918525,
+      "balanced_accuracy": 0.9206200756393885,
+      "precision_ai": 0.9791243201670055,
+      "recall_ai": 0.860931310984446,
+      "f1_ai": 0.9162318468063231,
+      "precision_real": 0.8679176033399092,
+      "recall_real": 0.9803088402943311,
+      "f1_real": 0.9206959484122156,
+      "f1_macro": 0.9184638976092694,
+      "mcc": 0.8441360529384011,
+      "fpr": 0.01969115970566898,
+      "fnr": 0.13906868901555405,
+      "confusion": {
+        "tn": 18918,
+        "fp": 380,
+        "fn": 2879,
+        "tp": 17823
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.005641908850520849,
+      "accuracy": 0.9439,
+      "balanced_accuracy": 0.9438097130045187,
+      "precision_ai": 0.9452861140596353,
+      "recall_ai": 0.9463819920780601,
+      "f1_ai": 0.945833735637733,
+      "precision_real": 0.9424094635259935,
+      "recall_real": 0.9412374339309773,
+      "f1_real": 0.9418230841024577,
+      "f1_macro": 0.9438284098700953,
+      "mcc": 0.8876575009807087,
+      "fpr": 0.0587625660690227,
+      "fnr": 0.05361800792193991,
+      "confusion": {
+        "tn": 18164,
+        "fp": 1134,
+        "fn": 1110,
+        "tp": 19592
+      }
+    }
+  }
+}

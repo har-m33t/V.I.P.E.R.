@@ -1,0 +1,196 @@
+{
+  "tag": "fusion_v1_full",
+  "arch": "convnext_tiny",
+  "fusion": true,
+  "feature_dim": 33,
+  "feature_names": [
+    "f_canny_edge_density",
+    "f_color_entropy",
+    "f_dominant_color_b",
+    "f_dominant_color_g",
+    "f_dominant_color_r",
+    "f_fft_high_freq_energy",
+    "f_fft_low_freq_energy",
+    "f_fft_ratio",
+    "f_glcm_contrast",
+    "f_glcm_correlation",
+    "f_glcm_energy",
+    "f_glcm_homogeneity",
+    "f_global_brightness",
+    "f_hue_std",
+    "f_lab_chroma_mean",
+    "f_lab_chroma_std",
+    "f_lab_saturation",
+    "f_mean_b",
+    "f_mean_g",
+    "f_mean_r",
+    "f_noise_energy",
+    "f_noise_mean",
+    "f_noise_std",
+    "f_prnu_autocorr_peak",
+    "f_prnu_energy",
+    "f_prnu_fft_ratio",
+    "f_prnu_mean",
+    "f_prnu_std",
+    "f_sobel_mean",
+    "f_sobel_std",
+    "f_std_b",
+    "f_std_g",
+    "f_std_r"
+  ],
+  "best_epoch": 11,
+  "trainable_params": 26893826,
+  "total_params": 28128866,
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.12344187038987875,
+      "val_auc": 0.9938917851665857,
+      "logo_auc": 0.9746813934735733,
+      "seconds": 119.4608142375946,
+      "img_per_s": 669.6756631918537
+    },
+    {
+      "epoch": 2,
+      "loss": 0.05353051796406508,
+      "val_auc": 0.9942065317234638,
+      "logo_auc": 0.9693905501016307,
+      "seconds": 89.95793390274048,
+      "img_per_s": 889.3045507969684
+    },
+    {
+      "epoch": 3,
+      "loss": 0.034220600172877313,
+      "val_auc": 0.9955658198580525,
+      "logo_auc": 0.9748966161300384,
+      "seconds": 89.32886600494385,
+      "img_per_s": 895.5671730521291
+    },
+    {
+      "epoch": 4,
+      "loss": 0.022699912576377393,
+      "val_auc": 0.9961690214391189,
+      "logo_auc": 0.9653572985954426,
+      "seconds": 90.51301383972168,
+      "img_per_s": 883.8508033956545
+    },
+    {
+      "epoch": 5,
+      "loss": 0.01704598396718502,
+      "val_auc": 0.9929687886305111,
+      "logo_auc": 0.9718454307891866,
+      "seconds": 90.76202940940857,
+      "img_per_s": 881.4258619002082
+    },
+    {
+      "epoch": 6,
+      "loss": 0.012517195411026479,
+      "val_auc": 0.9967669854017356,
+      "logo_auc": 0.9834322408550558,
+      "seconds": 91.20389580726624,
+      "img_per_s": 877.15551284188
+    },
+    {
+      "epoch": 7,
+      "loss": 0.007682610309123993,
+      "val_auc": 0.9967851505524283,
+      "logo_auc": 0.9803159778378561,
+      "seconds": 91.20185875892639,
+      "img_per_s": 877.1751046375466
+    },
+    {
+      "epoch": 8,
+      "loss": 0.005504079613089561,
+      "val_auc": 0.9957474234291657,
+      "logo_auc": 0.983307480899543,
+      "seconds": 91.24118208885193,
+      "img_per_s": 876.7970577375345
+    },
+    {
+      "epoch": 9,
+      "loss": 0.0034903784543275835,
+      "val_auc": 0.9975274542978622,
+      "logo_auc": 0.9814419550530449,
+      "seconds": 90.31359219551086,
+      "img_per_s": 885.8024363244904
+    },
+    {
+      "epoch": 10,
+      "loss": 0.003024547703564167,
+      "val_auc": 0.996010265590877,
+      "logo_auc": 0.9816218804729615,
+      "seconds": 90.05510354042053,
+      "img_per_s": 888.3449893996582
+    },
+    {
+      "epoch": 11,
+      "loss": 0.0017417746022343635,
+      "val_auc": 0.9973331376442016,
+      "logo_auc": 0.9857758319326995,
+      "seconds": 90.31323838233948,
+      "img_per_s": 885.8059065640126
+    },
+    {
+      "epoch": 12,
+      "loss": 0.0012906875610351563,
+      "val_auc": 0.9973362067977873,
+      "logo_auc": 0.9842849964584868,
+      "seconds": 90.27326345443726,
+      "img_per_s": 886.1981603265913
+    }
+  ],
+  "splits": {
+    "val": {
+      "auc": 0.9973331376442016,
+      "ap": 0.9970771706609217,
+      "n": 40000
+    },
+    "logo": {
+      "auc": 0.9857758319326995,
+      "ap": 0.9872899978495169,
+      "n": 40000
+    }
+  },
+  "per_held_out_generator": {
+    "BigGAN": {
+      "n_fake": 4848,
+      "auc": 0.9704897417078737,
+      "ap": 0.897198034213217
+    },
+    "Charles-Elena/playground-v2-1024px-aesthetic-ce": {
+      "n_fake": 21,
+      "auc": 1.0,
+      "ap": 1.0
+    },
+    "FloydianSound/Aoi_Ogata_Artstyle_v1-5": {
+      "n_fake": 22,
+      "auc": 0.999961135869002,
+      "ap": 0.9750320825419639
+    },
+    "GigaGAN": {
+      "n_fake": 8272,
+      "auc": 0.9884130734175758,
+      "ap": 0.9790639998982054
+    },
+    "StyleGAN2": {
+      "n_fake": 1801,
+      "auc": 0.9993123717440519,
+      "ap": 0.9936447112923644
+    },
+    "StyleGANXL": {
+      "n_fake": 2899,
+      "auc": 0.9882844553021114,
+      "ap": 0.9484676093447146
+    },
+    "StyleSANXL": {
+      "n_fake": 2794,
+      "auc": 0.9927218823808003,
+      "ap": 0.9612926086531985
+    },
+    "tftgregrge/mpid-hassanblend-v1-5-better-train-3000": {
+      "n_fake": 27,
+      "auc": 0.9993244358463552,
+      "ap": 0.9052639310127233
+    }
+  }
+}

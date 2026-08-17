@@ -1,0 +1,147 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING:huggingface_hub.utils._http:Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[s6] CLIP ViT-L/14 loaded, dim=768, blur=0.0
+[s6] extracting train: 80,000 images
+    51,200/80,000  145 img/s
+[s6] extracting val: 76,093 images
+    51,200/76,093  481 img/s
+[s6] extracting logo: 80,000 images
+    51,200/80,000  144 img/s
+[s6] ep01 loss=0.6869 val_auc=0.9027 LOGO_auc=0.8027
+[s6] ep02 loss=0.6731 val_auc=0.9134 LOGO_auc=0.8211
+[s6] ep03 loss=0.6600 val_auc=0.9155 LOGO_auc=0.8253
+[s6] ep04 loss=0.6473 val_auc=0.9174 LOGO_auc=0.8288
+[s6] ep05 loss=0.6353 val_auc=0.9183 LOGO_auc=0.8312
+[s6] ep06 loss=0.6238 val_auc=0.9195 LOGO_auc=0.8336
+[s6] ep07 loss=0.6128 val_auc=0.9205 LOGO_auc=0.8360
+[s6] ep08 loss=0.6023 val_auc=0.9214 LOGO_auc=0.8380
+[s6] ep09 loss=0.5922 val_auc=0.9224 LOGO_auc=0.8403
+[s6] ep10 loss=0.5825 val_auc=0.9232 LOGO_auc=0.8422
+[s6] ep11 loss=0.5733 val_auc=0.9242 LOGO_auc=0.8442
+[s6] ep12 loss=0.5645 val_auc=0.9250 LOGO_auc=0.8462
+[s6] ep13 loss=0.5560 val_auc=0.9258 LOGO_auc=0.8481
+[s6] ep14 loss=0.5479 val_auc=0.9267 LOGO_auc=0.8500
+[s6] ep15 loss=0.5400 val_auc=0.9275 LOGO_auc=0.8521
+[s6] ep16 loss=0.5326 val_auc=0.9283 LOGO_auc=0.8540
+[s6] ep17 loss=0.5253 val_auc=0.9291 LOGO_auc=0.8558
+[s6] ep18 loss=0.5184 val_auc=0.9298 LOGO_auc=0.8575
+[s6] ep19 loss=0.5118 val_auc=0.9305 LOGO_auc=0.8592
+[s6] ep20 loss=0.5053 val_auc=0.9312 LOGO_auc=0.8608
+[s6] ep21 loss=0.4991 val_auc=0.9319 LOGO_auc=0.8625
+[s6] ep22 loss=0.4932 val_auc=0.9326 LOGO_auc=0.8641
+[s6] ep23 loss=0.4874 val_auc=0.9333 LOGO_auc=0.8657
+[s6] ep24 loss=0.4819 val_auc=0.9339 LOGO_auc=0.8673
+[s6] ep25 loss=0.4765 val_auc=0.9345 LOGO_auc=0.8687
+[s6] ep26 loss=0.4713 val_auc=0.9351 LOGO_auc=0.8702
+[s6] ep27 loss=0.4663 val_auc=0.9357 LOGO_auc=0.8715
+[s6] ep28 loss=0.4615 val_auc=0.9362 LOGO_auc=0.8729
+[s6] ep29 loss=0.4568 val_auc=0.9368 LOGO_auc=0.8743
+[s6] ep30 loss=0.4523 val_auc=0.9373 LOGO_auc=0.8754
+[s6] ep31 loss=0.4479 val_auc=0.9378 LOGO_auc=0.8766
+[s6] ep32 loss=0.4436 val_auc=0.9383 LOGO_auc=0.8778
+[s6] ep33 loss=0.4395 val_auc=0.9388 LOGO_auc=0.8790
+[s6] ep34 loss=0.4355 val_auc=0.9393 LOGO_auc=0.8802
+[s6] ep35 loss=0.4316 val_auc=0.9398 LOGO_auc=0.8813
+[s6] ep36 loss=0.4278 val_auc=0.9402 LOGO_auc=0.8824
+[s6] ep37 loss=0.4241 val_auc=0.9407 LOGO_auc=0.8835
+[s6] ep38 loss=0.4206 val_auc=0.9411 LOGO_auc=0.8845
+[s6] ep39 loss=0.4171 val_auc=0.9415 LOGO_auc=0.8855
+[s6] ep40 loss=0.4138 val_auc=0.9419 LOGO_auc=0.8865
+[s6] ep41 loss=0.4105 val_auc=0.9423 LOGO_auc=0.8874
+[s6] ep42 loss=0.4073 val_auc=0.9427 LOGO_auc=0.8884
+[s6] ep43 loss=0.4042 val_auc=0.9431 LOGO_auc=0.8893
+[s6] ep44 loss=0.4011 val_auc=0.9435 LOGO_auc=0.8902
+[s6] ep45 loss=0.3982 val_auc=0.9439 LOGO_auc=0.8911
+[s6] ep46 loss=0.3953 val_auc=0.9443 LOGO_auc=0.8920
+[s6] ep47 loss=0.3925 val_auc=0.9446 LOGO_auc=0.8928
+[s6] ep48 loss=0.3898 val_auc=0.9450 LOGO_auc=0.8936
+[s6] ep49 loss=0.3871 val_auc=0.9453 LOGO_auc=0.8944
+[s6] ep50 loss=0.3845 val_auc=0.9456 LOGO_auc=0.8952
+[s6] ep51 loss=0.3820 val_auc=0.9460 LOGO_auc=0.8960
+[s6] ep52 loss=0.3795 val_auc=0.9463 LOGO_auc=0.8967
+[s6] ep53 loss=0.3771 val_auc=0.9466 LOGO_auc=0.8974
+[s6] ep54 loss=0.3747 val_auc=0.9469 LOGO_auc=0.8981
+[s6] ep55 loss=0.3724 val_auc=0.9472 LOGO_auc=0.8989
+[s6] ep56 loss=0.3701 val_auc=0.9475 LOGO_auc=0.8996
+[s6] ep57 loss=0.3679 val_auc=0.9478 LOGO_auc=0.9002
+[s6] ep58 loss=0.3657 val_auc=0.9481 LOGO_auc=0.9009
+[s6] ep59 loss=0.3636 val_auc=0.9484 LOGO_auc=0.9015
+[s6] ep60 loss=0.3616 val_auc=0.9486 LOGO_auc=0.9022
+[s6] ep61 loss=0.3595 val_auc=0.9489 LOGO_auc=0.9028
+[s6] ep62 loss=0.3575 val_auc=0.9492 LOGO_auc=0.9034
+[s6] ep63 loss=0.3556 val_auc=0.9494 LOGO_auc=0.9041
+[s6] ep64 loss=0.3537 val_auc=0.9497 LOGO_auc=0.9047
+[s6] ep65 loss=0.3518 val_auc=0.9500 LOGO_auc=0.9053
+[s6] ep66 loss=0.3500 val_auc=0.9502 LOGO_auc=0.9058
+[s6] ep67 loss=0.3482 val_auc=0.9505 LOGO_auc=0.9064
+[s6] ep68 loss=0.3464 val_auc=0.9507 LOGO_auc=0.9070
+[s6] ep69 loss=0.3447 val_auc=0.9509 LOGO_auc=0.9075
+[s6] ep70 loss=0.3430 val_auc=0.9512 LOGO_auc=0.9081
+[s6] ep71 loss=0.3414 val_auc=0.9514 LOGO_auc=0.9086
+[s6] ep72 loss=0.3397 val_auc=0.9516 LOGO_auc=0.9091
+[s6] ep73 loss=0.3381 val_auc=0.9519 LOGO_auc=0.9096
+[s6] ep74 loss=0.3365 val_auc=0.9521 LOGO_auc=0.9101
+[s6] ep75 loss=0.3350 val_auc=0.9523 LOGO_auc=0.9106
+[s6] ep76 loss=0.3335 val_auc=0.9525 LOGO_auc=0.9111
+[s6] ep77 loss=0.3320 val_auc=0.9527 LOGO_auc=0.9116
+[s6] ep78 loss=0.3305 val_auc=0.9529 LOGO_auc=0.9120
+[s6] ep79 loss=0.3291 val_auc=0.9531 LOGO_auc=0.9125
+[s6] ep80 loss=0.3277 val_auc=0.9533 LOGO_auc=0.9129
+[s6] ep81 loss=0.3263 val_auc=0.9535 LOGO_auc=0.9134
+[s6] ep82 loss=0.3250 val_auc=0.9537 LOGO_auc=0.9138
+[s6] ep83 loss=0.3236 val_auc=0.9539 LOGO_auc=0.9143
+[s6] ep84 loss=0.3223 val_auc=0.9541 LOGO_auc=0.9147
+[s6] ep85 loss=0.3210 val_auc=0.9543 LOGO_auc=0.9152
+[s6] ep86 loss=0.3197 val_auc=0.9545 LOGO_auc=0.9156
+[s6] ep87 loss=0.3185 val_auc=0.9547 LOGO_auc=0.9160
+[s6] ep88 loss=0.3172 val_auc=0.9549 LOGO_auc=0.9164
+[s6] ep89 loss=0.3160 val_auc=0.9551 LOGO_auc=0.9168
+[s6] ep90 loss=0.3148 val_auc=0.9552 LOGO_auc=0.9172
+[s6] ep91 loss=0.3137 val_auc=0.9554 LOGO_auc=0.9176
+[s6] ep92 loss=0.3125 val_auc=0.9556 LOGO_auc=0.9180
+[s6] ep93 loss=0.3114 val_auc=0.9558 LOGO_auc=0.9183
+[s6] ep94 loss=0.3102 val_auc=0.9559 LOGO_auc=0.9187
+[s6] ep95 loss=0.3091 val_auc=0.9561 LOGO_auc=0.9191
+[s6] ep96 loss=0.3080 val_auc=0.9563 LOGO_auc=0.9195
+[s6] ep97 loss=0.3070 val_auc=0.9564 LOGO_auc=0.9198
+[s6] ep98 loss=0.3059 val_auc=0.9566 LOGO_auc=0.9202
+[s6] ep99 loss=0.3049 val_auc=0.9567 LOGO_auc=0.9205
+[s6] ep100 loss=0.3038 val_auc=0.9569 LOGO_auc=0.9209
+[s6] ep101 loss=0.3028 val_auc=0.9571 LOGO_auc=0.9212
+[s6] ep102 loss=0.3018 val_auc=0.9572 LOGO_auc=0.9215
+[s6] ep103 loss=0.3008 val_auc=0.9574 LOGO_auc=0.9219
+[s6] ep104 loss=0.2999 val_auc=0.9575 LOGO_auc=0.9222
+[s6] ep105 loss=0.2989 val_auc=0.9577 LOGO_auc=0.9225
+[s6] ep106 loss=0.2980 val_auc=0.9578 LOGO_auc=0.9228
+[s6] ep107 loss=0.2971 val_auc=0.9580 LOGO_auc=0.9232
+[s6] ep108 loss=0.2961 val_auc=0.9581 LOGO_auc=0.9235
+[s6] ep109 loss=0.2952 val_auc=0.9583 LOGO_auc=0.9238
+[s6] ep110 loss=0.2943 val_auc=0.9584 LOGO_auc=0.9241
+[s6] ep111 loss=0.2935 val_auc=0.9585 LOGO_auc=0.9244
+[s6] ep112 loss=0.2926 val_auc=0.9587 LOGO_auc=0.9247
+[s6] ep113 loss=0.2917 val_auc=0.9588 LOGO_auc=0.9250
+[s6] ep114 loss=0.2909 val_auc=0.9590 LOGO_auc=0.9253
+[s6] ep115 loss=0.2901 val_auc=0.9591 LOGO_auc=0.9255
+[s6] ep116 loss=0.2892 val_auc=0.9592 LOGO_auc=0.9258
+[s6] ep117 loss=0.2884 val_auc=0.9594 LOGO_auc=0.9261
+[s6] ep118 loss=0.2876 val_auc=0.9595 LOGO_auc=0.9264
+[s6] ep119 loss=0.2868 val_auc=0.9596 LOGO_auc=0.9267
+[s6] ep120 loss=0.2860 val_auc=0.9597 LOGO_auc=0.9269
+{
+  "train": {
+    "auc": 0.9597806952268342,
+    "ap": 0.9656519693441321,
+    "n": 80000
+  },
+  "val": {
+    "auc": 0.9597369099764083,
+    "ap": 0.9627941670690989,
+    "n": 76093
+  },
+  "logo": {
+    "auc": 0.9269143990851588,
+    "ap": 0.9318436005565158,
+    "n": 80000
+  }
+}
+[s6] -> /data/logs/probe_clean_v1.json

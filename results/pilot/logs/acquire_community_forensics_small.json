@@ -1,0 +1,14 @@
+{
+  "dataset": "community_forensics_small",
+  "repo_id": "OwensLab/CommunityForensics-Small",
+  "tag": "train",
+  "citation": "Park & Owens, Community Forensics, CVPR 2025 (arXiv:2411.04125)",
+  "license": "cc-by-nc-sa-4.0 (non-commercial research only)",
+  "n_files": 567,
+  "bytes": 259701855397,
+  "gb": 259.7,
+  "wall_seconds": 156.7,
+  "mb_per_s": 1657.5,
+  "failed": [],
+  "completed_utc": "2026-08-16T01:27:17Z"
+}

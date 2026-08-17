@@ -1,0 +1,67 @@
+{
+  "proc_name": "community_forensics_small",
+  "n_rows": 556541,
+  "n_duplicates_dropped": 1610,
+  "duplicate_pairs_by_dataset": {
+    "community_forensics_small|community_forensics_small": 1610
+  },
+  "split_counts": {
+    "train": 388288,
+    "val": 76093,
+    "balanced_out": 1184,
+    "logo": 85783,
+    "dropped_dup": 1610,
+    "capped_out": 3583
+  },
+  "n_generators_total": 4782,
+  "n_generators_train": 4069,
+  "n_generators_val": 704,
+  "logo_families": {
+    "gan": [
+      "GigaGAN",
+      "BigGAN",
+      "StyleGAN2"
+    ],
+    "sd1x": [
+      "tftgregrge/mpid-hassanblend-v1-5-better-train-3000",
+      "FloydianSound/Redline_Diffusion_V1-5",
+      "FloydianSound/Aoi_Ogata_Artstyle_v1-5"
+    ],
+    "modern_open": [
+      "StyleGANXL",
+      "StyleSANXL",
+      "Charles-Elena/playground-v2-1024px-aesthetic-ce"
+    ]
+  },
+  "required_families_missing": [
+    "commercial"
+  ],
+  "reals_group_aware": false,
+  "logo_generators": [
+    "BigGAN",
+    "Charles-Elena/playground-v2-1024px-aesthetic-ce",
+    "FloydianSound/Aoi_Ogata_Artstyle_v1-5",
+    "FloydianSound/Redline_Diffusion_V1-5",
+    "GigaGAN",
+    "StyleGAN2",
+    "StyleGANXL",
+    "StyleSANXL",
+    "tftgregrge/mpid-hassanblend-v1-5-better-train-3000"
+  ],
+  "per_generator_cap": 4668,
+  "train_per_class": 194144,
+  "class_counts": {
+    "train": {
+      "1": 194144,
+      "0": 194144
+    },
+    "val": {
+      "1": 34492,
+      "0": 41601
+    },
+    "logo": {
+      "0": 41601,
+      "1": 44182
+    }
+  }
+}

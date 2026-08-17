@@ -1,0 +1,23 @@
+[forensic] restricting to 160,000 uids
+[forensic] 186 shards, 56 workers
+[forensic] 10/186 | 7,761 imgs | 20 img/s | 6.5 min
+[forensic] 20/186 | 16,285 imgs | 40 img/s | 6.8 min
+[forensic] 30/186 | 24,923 imgs | 59 img/s | 7.1 min
+[forensic] 40/186 | 33,588 imgs | 76 img/s | 7.4 min
+[forensic] 50/186 | 42,497 imgs | 93 img/s | 7.6 min
+[forensic] 60/186 | 51,190 imgs | 69 img/s | 12.3 min
+[forensic] 70/186 | 59,204 imgs | 76 img/s | 12.9 min
+[forensic] 80/186 | 67,617 imgs | 86 img/s | 13.2 min
+[forensic] 90/186 | 75,720 imgs | 94 img/s | 13.5 min
+[forensic] 100/186 | 84,265 imgs | 101 img/s | 13.9 min
+[forensic] 110/186 | 92,942 imgs | 108 img/s | 14.3 min
+[forensic] 120/186 | 99,957 imgs | 93 img/s | 17.9 min
+[forensic] 130/186 | 106,993 imgs | 97 img/s | 18.4 min
+[forensic] 140/186 | 114,193 imgs | 101 img/s | 18.8 min
+[forensic] 150/186 | 121,769 imgs | 106 img/s | 19.2 min
+[forensic] 160/186 | 129,575 imgs | 109 img/s | 19.9 min
+[forensic] 170/186 | 140,535 imgs | 110 img/s | 21.3 min
+[forensic] 180/186 | 151,525 imgs | 116 img/s | 21.7 min
+[forensic] 186/186 | 160,000 imgs | 122 img/s | 21.9 min
+[forensic] DONE 160,000 images, 0 failed, 33 features/image -> /data/features/cfsmall_v1
+[forensic] features: ['canny_edge_density', 'color_entropy', 'dominant_color_b', 'dominant_color_g', 'dominant_color_r', 'fft_high_freq_energy', 'fft_low_freq_energy', 'fft_ratio', 'glcm_contrast', 'glcm_correlation', 'glcm_energy', 'glcm_homogeneity', 'global_brightness', 'hue_std', 'lab_chroma_mean', 'lab_chroma_std', 'lab_saturation', 'mean_b', 'mean_g', 'mean_r', 'noise_energy', 'noise_mean', 'noise_std', 'prnu_autocorr_peak', 'prnu_energy', 'prnu_fft_ratio', 'prnu_mean', 'prnu_std', 'sobel_mean', 'sobel_std', 'std_b', 'std_g', 'std_r']

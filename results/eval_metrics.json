@@ -1,0 +1,83 @@
+{
+  "accuracy": 0.9870331950207469,
+  "f1": 0.9933208656158162,
+  "precision": 0.9888297872340426,
+  "recall": 0.9978529253891573,
+  "auc_roc": 0.9744085222346092,
+  "n_samples": 1928,
+  "balanced_accuracy": 0.8373880011561171,
+  "mcc": 0.7816695448020378,
+  "f1_macro": 0.8860409637813594,
+  "recall_ai": 0.9978529253891573,
+  "recall_real": 0.676923076923077,
+  "precision_real": 0.9166666666666666,
+  "n_ai": 1863,
+  "n_real": 65,
+  "majority_class_share": 0.9662863070539419,
+  "majority_baseline_accuracy": 0.9662863070539419,
+  "predicted_all_one_class": false,
+  "split": "validation",
+  "test_accuracy": 0.9870331950207469,
+  "test_f1": 0.9933422103861518,
+  "test_auc_roc": 0.9757203842049093,
+  "validation": {
+    "accuracy": 0.9870331950207469,
+    "f1": 0.9933208656158162,
+    "precision": 0.9888297872340426,
+    "recall": 0.9978529253891573,
+    "auc_roc": 0.9744085222346092,
+    "n_samples": 1928,
+    "balanced_accuracy": 0.8373880011561171,
+    "mcc": 0.7816695448020378,
+    "f1_macro": 0.8860409637813594,
+    "recall_ai": 0.9978529253891573,
+    "recall_real": 0.676923076923077,
+    "precision_real": 0.9166666666666666,
+    "n_ai": 1863,
+    "n_real": 65,
+    "majority_class_share": 0.9662863070539419,
+    "majority_baseline_accuracy": 0.9662863070539419,
+    "predicted_all_one_class": false,
+    "split": "validation"
+  },
+  "test": {
+    "accuracy": 0.9870331950207469,
+    "f1": 0.9933422103861518,
+    "precision": 0.9914938862307283,
+    "recall": 0.9951974386339381,
+    "auc_roc": 0.9757203842049093,
+    "n_samples": 1928,
+    "balanced_accuracy": 0.849450571168821,
+    "mcc": 0.7477459970259426,
+    "f1_macro": 0.8729087289554521,
+    "recall_ai": 0.9951974386339381,
+    "recall_real": 0.7037037037037037,
+    "precision_real": 0.8085106382978723,
+    "n_ai": 1874,
+    "n_real": 54,
+    "majority_class_share": 0.9719917012448133,
+    "majority_baseline_accuracy": 0.9719917012448133,
+    "predicted_all_one_class": false,
+    "split": "test"
+  },
+  "validation_confusion_matrix": {
+    "order": [
+      "REAL",
+      "AI_GENERATED"
+    ],
+    "matrix": [
+      [
+        44,
+        21
+      ],
+      [
+        4,
+        1859
+      ]
+    ],
+    "true_real_pred_real": 44,
+    "true_real_pred_ai": 21,
+    "true_ai_pred_real": 4,
+    "true_ai_pred_ai": 1859
+  }
+}

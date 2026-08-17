@@ -1,0 +1,122 @@
+[viper] loaded forensic features: 160,000 uids x 33 dims
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] forensic features: 33 dims, standardized on train (n=80,000)
+[viper] VIPER-ConvNeXt-Frozen: trainable 308,738/28,128,866 unfreeze_stages=0 head=mlp feat_dim=33 lr=0.001
+[viper] ep01 loss=0.2276 val_auc=0.9733 LOGO_auc=0.9262 [1.2min 1157 img/s]
+[viper] ep02 loss=0.1751 val_auc=0.9753 LOGO_auc=0.9211 [1.0min 1386 img/s]
+[viper] ep03 loss=0.1540 val_auc=0.9745 LOGO_auc=0.9191 [1.0min 1378 img/s]
+[viper] ep04 loss=0.1388 val_auc=0.9747 LOGO_auc=0.9256 [1.0min 1355 img/s]
+[viper] ep05 loss=0.1273 val_auc=0.9749 LOGO_auc=0.9289 [1.0min 1349 img/s]
+[viper] ep06 loss=0.1151 val_auc=0.9777 LOGO_auc=0.9336 [1.0min 1334 img/s]
+[viper] ep07 loss=0.1006 val_auc=0.9761 LOGO_auc=0.9308 [1.0min 1315 img/s]
+[viper] ep08 loss=0.0932 val_auc=0.9769 LOGO_auc=0.9280 [1.0min 1369 img/s]
+[viper] ep09 loss=0.0828 val_auc=0.9765 LOGO_auc=0.9332 [1.0min 1379 img/s]
+[viper] ep10 loss=0.0777 val_auc=0.9773 LOGO_auc=0.9325 [1.0min 1376 img/s]
+[viper] ep11 loss=0.0732 val_auc=0.9769 LOGO_auc=0.9300 [1.0min 1357 img/s]
+[viper] ep12 loss=0.0721 val_auc=0.9769 LOGO_auc=0.9307 [1.0min 1319 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.9776975091725876,
+    "ap": 0.9777466500475072,
+    "brier": 0.05578483267282445,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.928075,
+      "balanced_accuracy": 0.9234385938471894,
+      "precision_ai": 0.9627737226277372,
+      "recall_ai": 0.8748134637705189,
+      "f1_ai": 0.9166883850230214,
+      "precision_real": 0.9038624787775892,
+      "recall_real": 0.97206372392386,
+      "f1_real": 0.9367233378054413,
+      "f1_macro": 0.9267058614142314,
+      "mcc": 0.8566997309444436,
+      "fpr": 0.027936276076140045,
+      "fnr": 0.125186536229481,
+      "confusion": {
+        "tn": 21295,
+        "fp": 612,
+        "fn": 2265,
+        "tp": 15828
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.3293917179107666,
+      "accuracy": 0.9294,
+      "balanced_accuracy": 0.9268133117584829,
+      "precision_ai": 0.9416324405622722,
+      "recall_ai": 0.8996849610346543,
+      "f1_ai": 0.9201808931599774,
+      "precision_real": 0.9200898164047021,
+      "recall_real": 0.9539416624823116,
+      "f1_real": 0.9367099955177051,
+      "f1_macro": 0.9284454443388412,
+      "mcc": 0.8576648883008664,
+      "fpr": 0.04605833751768841,
+      "fnr": 0.10031503896534572,
+      "confusion": {
+        "tn": 20898,
+        "fp": 1009,
+        "fn": 1815,
+        "tp": 16278
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.9335607899788618,
+    "ap": 0.9416223074795811,
+    "brier": 0.14681458356808147,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.808425,
+      "balanced_accuracy": 0.81396185164084,
+      "precision_ai": 0.9613615455381784,
+      "recall_ai": 0.6562167906482466,
+      "f1_ai": 0.7800074641862601,
+      "precision_real": 0.7248830646720013,
+      "recall_real": 0.9717069126334336,
+      "f1_real": 0.830340735492727,
+      "f1_macro": 0.8051740998394936,
+      "mcc": 0.6564367882745977,
+      "fpr": 0.028293087366566484,
+      "fnr": 0.34378320935175344,
+      "confusion": {
+        "tn": 18752,
+        "fp": 546,
+        "fn": 7117,
+        "tp": 13585
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.08882028609514236,
+      "accuracy": 0.860775,
+      "balanced_accuracy": 0.8605830544288868,
+      "precision_ai": 0.8650904704463208,
+      "recall_ai": 0.866051589218433,
+      "f1_ai": 0.8655707630289424,
+      "precision_real": 0.8561348897535668,
+      "recall_real": 0.8551145196393408,
+      "f1_real": 0.8556244004873875,
+      "f1_macro": 0.860597581758165,
+      "mcc": 0.7211957339203411,
+      "fpr": 0.14488548036065912,
+      "fnr": 0.133948410781567,
+      "confusion": {
+        "tn": 16502,
+        "fp": 2796,
+        "fn": 2773,
+        "tp": 17929
+      }
+    }
+  }
+}

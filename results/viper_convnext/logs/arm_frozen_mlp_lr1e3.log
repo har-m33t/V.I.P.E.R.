@@ -1,0 +1,120 @@
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] ConvNeXt-Frozen-MLP (no forensic): trainable 296,066/28,116,194 unfreeze_stages=0 head=mlp feat_dim=0 lr=0.001
+[viper] ep01 loss=0.2452 val_auc=0.9724 LOGO_auc=0.9320 [1.1min 1171 img/s]
+[viper] ep02 loss=0.1932 val_auc=0.9747 LOGO_auc=0.9307 [1.0min 1389 img/s]
+[viper] ep03 loss=0.1724 val_auc=0.9757 LOGO_auc=0.9439 [1.0min 1381 img/s]
+[viper] ep04 loss=0.1558 val_auc=0.9754 LOGO_auc=0.9358 [1.0min 1387 img/s]
+[viper] ep05 loss=0.1402 val_auc=0.9747 LOGO_auc=0.9328 [1.0min 1351 img/s]
+[viper] ep06 loss=0.1264 val_auc=0.9758 LOGO_auc=0.9328 [1.0min 1366 img/s]
+[viper] ep07 loss=0.1140 val_auc=0.9761 LOGO_auc=0.9280 [1.0min 1360 img/s]
+[viper] ep08 loss=0.1046 val_auc=0.9761 LOGO_auc=0.9335 [1.0min 1359 img/s]
+[viper] ep09 loss=0.0977 val_auc=0.9767 LOGO_auc=0.9355 [1.0min 1330 img/s]
+[viper] ep10 loss=0.0886 val_auc=0.9767 LOGO_auc=0.9324 [1.0min 1359 img/s]
+[viper] ep11 loss=0.0846 val_auc=0.9766 LOGO_auc=0.9337 [1.0min 1341 img/s]
+[viper] ep12 loss=0.0824 val_auc=0.9764 LOGO_auc=0.9320 [1.0min 1350 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.9757499401098766,
+    "ap": 0.9751274389563436,
+    "brier": 0.05673454949357049,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.925225,
+      "balanced_accuracy": 0.9218037454224672,
+      "precision_ai": 0.9453290870488322,
+      "recall_ai": 0.8859227325484994,
+      "f1_ai": 0.9146623298810237,
+      "precision_real": 0.9104322166290575,
+      "recall_real": 0.957684758296435,
+      "f1_real": 0.93346087962448,
+      "f1_macro": 0.9240616047527519,
+      "mcc": 0.8496626660963129,
+      "fpr": 0.04231524170356507,
+      "fnr": 0.11407726745150058,
+      "confusion": {
+        "tn": 20980,
+        "fp": 927,
+        "fn": 2064,
+        "tp": 16029
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.38676345348358154,
+      "accuracy": 0.92435,
+      "balanced_accuracy": 0.9225348889534442,
+      "precision_ai": 0.9273841266239292,
+      "recall_ai": 0.903498590615155,
+      "f1_ai": 0.9152855543113102,
+      "precision_real": 0.921959504760202,
+      "recall_real": 0.9415711872917333,
+      "f1_real": 0.9316621499548329,
+      "f1_macro": 0.9234738521330715,
+      "mcc": 0.8472040096342898,
+      "fpr": 0.05842881270826676,
+      "fnr": 0.09650140938484497,
+      "confusion": {
+        "tn": 20627,
+        "fp": 1280,
+        "fn": 1746,
+        "tp": 16347
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.9439259574688611,
+    "ap": 0.946203109342274,
+    "brier": 0.11862568764009475,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.8394,
+      "balanced_accuracy": 0.8434454482266698,
+      "precision_ai": 0.9497857862903226,
+      "recall_ai": 0.7281905129939137,
+      "f1_ai": 0.8243560999617214,
+      "precision_real": 0.7667854774535809,
+      "recall_real": 0.9587003834594259,
+      "f1_real": 0.8520701883664165,
+      "f1_macro": 0.838213144164069,
+      "mcc": 0.7015741427146188,
+      "fpr": 0.04129961654057415,
+      "fnr": 0.27180948700608637,
+      "confusion": {
+        "tn": 18501,
+        "fp": 797,
+        "fn": 5627,
+        "tp": 15075
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.15817435085773468,
+      "accuracy": 0.88015,
+      "balanced_accuracy": 0.8796349140104099,
+      "precision_ai": 0.8766098484848485,
+      "recall_ai": 0.8943097285286445,
+      "f1_ai": 0.8853713356606571,
+      "precision_real": 0.8841101694915254,
+      "recall_real": 0.8649600994921753,
+      "f1_real": 0.8744303001728744,
+      "f1_macro": 0.8799008179167658,
+      "mcc": 0.7599945770996768,
+      "fpr": 0.13503990050782463,
+      "fnr": 0.10569027147135543,
+      "confusion": {
+        "tn": 16692,
+        "fp": 2606,
+        "fn": 2188,
+        "tp": 18514
+      }
+    }
+  }
+}

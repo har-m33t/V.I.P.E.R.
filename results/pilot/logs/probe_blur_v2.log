@@ -1,0 +1,62 @@
+[s6] CLIP ViT-L/14 loaded, dim=768, blur=3.0
+[s6] extracting train: 30,000 images
+[s6] extracting val: 30,000 images
+[s6] extracting logo: 30,000 images
+[s6] ep01 loss=0.6912 val_auc=0.7588 LOGO_auc=0.6811
+[s6] ep02 loss=0.6859 val_auc=0.8029 LOGO_auc=0.7084
+[s6] ep03 loss=0.6807 val_auc=0.8156 LOGO_auc=0.7167
+[s6] ep04 loss=0.6757 val_auc=0.8214 LOGO_auc=0.7204
+[s6] ep05 loss=0.6708 val_auc=0.8257 LOGO_auc=0.7228
+[s6] ep06 loss=0.6660 val_auc=0.8290 LOGO_auc=0.7248
+[s6] ep07 loss=0.6613 val_auc=0.8319 LOGO_auc=0.7266
+[s6] ep08 loss=0.6567 val_auc=0.8343 LOGO_auc=0.7280
+[s6] ep09 loss=0.6522 val_auc=0.8366 LOGO_auc=0.7296
+[s6] ep10 loss=0.6477 val_auc=0.8388 LOGO_auc=0.7310
+[s6] ep11 loss=0.6434 val_auc=0.8412 LOGO_auc=0.7325
+[s6] ep12 loss=0.6392 val_auc=0.8434 LOGO_auc=0.7342
+[s6] ep13 loss=0.6350 val_auc=0.8453 LOGO_auc=0.7357
+[s6] ep14 loss=0.6309 val_auc=0.8473 LOGO_auc=0.7371
+[s6] ep15 loss=0.6270 val_auc=0.8492 LOGO_auc=0.7386
+[s6] ep16 loss=0.6230 val_auc=0.8511 LOGO_auc=0.7400
+[s6] ep17 loss=0.6192 val_auc=0.8531 LOGO_auc=0.7416
+[s6] ep18 loss=0.6154 val_auc=0.8548 LOGO_auc=0.7429
+[s6] ep19 loss=0.6118 val_auc=0.8565 LOGO_auc=0.7443
+[s6] ep20 loss=0.6081 val_auc=0.8581 LOGO_auc=0.7456
+[s6] ep21 loss=0.6046 val_auc=0.8598 LOGO_auc=0.7469
+[s6] ep22 loss=0.6011 val_auc=0.8614 LOGO_auc=0.7482
+[s6] ep23 loss=0.5976 val_auc=0.8631 LOGO_auc=0.7495
+[s6] ep24 loss=0.5943 val_auc=0.8645 LOGO_auc=0.7506
+[s6] ep25 loss=0.5910 val_auc=0.8660 LOGO_auc=0.7518
+[s6] ep26 loss=0.5877 val_auc=0.8674 LOGO_auc=0.7528
+[s6] ep27 loss=0.5845 val_auc=0.8687 LOGO_auc=0.7538
+[s6] ep28 loss=0.5813 val_auc=0.8701 LOGO_auc=0.7549
+[s6] ep29 loss=0.5783 val_auc=0.8714 LOGO_auc=0.7560
+[s6] ep30 loss=0.5752 val_auc=0.8727 LOGO_auc=0.7572
+[s6] ep31 loss=0.5722 val_auc=0.8739 LOGO_auc=0.7582
+[s6] ep32 loss=0.5693 val_auc=0.8751 LOGO_auc=0.7592
+[s6] ep33 loss=0.5664 val_auc=0.8762 LOGO_auc=0.7601
+[s6] ep34 loss=0.5635 val_auc=0.8774 LOGO_auc=0.7609
+[s6] ep35 loss=0.5607 val_auc=0.8785 LOGO_auc=0.7619
+[s6] ep36 loss=0.5580 val_auc=0.8796 LOGO_auc=0.7627
+[s6] ep37 loss=0.5553 val_auc=0.8807 LOGO_auc=0.7637
+[s6] ep38 loss=0.5526 val_auc=0.8817 LOGO_auc=0.7645
+[s6] ep39 loss=0.5500 val_auc=0.8827 LOGO_auc=0.7652
+[s6] ep40 loss=0.5474 val_auc=0.8836 LOGO_auc=0.7660
+{
+  "train": {
+    "auc": 0.896133231486813,
+    "ap": 0.9073464761571637,
+    "n": 30000
+  },
+  "val": {
+    "auc": 0.8836081812522347,
+    "ap": 0.8827144888717794,
+    "n": 30000
+  },
+  "logo": {
+    "auc": 0.7659571497829456,
+    "ap": 0.7701068110432643,
+    "n": 30000
+  }
+}
+[s6] -> /data/logs/probe_blur3_v2.json

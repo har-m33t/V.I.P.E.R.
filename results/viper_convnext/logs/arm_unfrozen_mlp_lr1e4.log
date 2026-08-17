@@ -1,0 +1,120 @@
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] ConvNeXt-Unfrozen-MLP (no forensic): trainable 26,881,154/28,116,194 unfreeze_stages=2 head=mlp feat_dim=0 lr=0.0001
+[viper] ep01 loss=0.1211 val_auc=0.9935 LOGO_auc=0.9734 [1.3min 1061 img/s]
+[viper] ep02 loss=0.0542 val_auc=0.9915 LOGO_auc=0.9735 [1.0min 1354 img/s]
+[viper] ep03 loss=0.0359 val_auc=0.9969 LOGO_auc=0.9768 [1.0min 1357 img/s]
+[viper] ep04 loss=0.0219 val_auc=0.9944 LOGO_auc=0.9726 [1.0min 1350 img/s]
+[viper] ep05 loss=0.0166 val_auc=0.9970 LOGO_auc=0.9802 [1.0min 1343 img/s]
+[viper] ep06 loss=0.0113 val_auc=0.9970 LOGO_auc=0.9802 [1.0min 1338 img/s]
+[viper] ep07 loss=0.0078 val_auc=0.9949 LOGO_auc=0.9765 [1.0min 1333 img/s]
+[viper] ep08 loss=0.0056 val_auc=0.9965 LOGO_auc=0.9789 [1.0min 1340 img/s]
+[viper] ep09 loss=0.0043 val_auc=0.9973 LOGO_auc=0.9840 [1.0min 1338 img/s]
+[viper] ep10 loss=0.0025 val_auc=0.9966 LOGO_auc=0.9778 [1.0min 1330 img/s]
+[viper] ep11 loss=0.0021 val_auc=0.9972 LOGO_auc=0.9835 [1.0min 1354 img/s]
+[viper] ep12 loss=0.0017 val_auc=0.9971 LOGO_auc=0.9833 [1.0min 1333 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.9973169567839282,
+    "ap": 0.9970303489205194,
+    "brier": 0.02089426854546871,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.975475,
+      "balanced_accuracy": 0.9741602358690322,
+      "precision_ai": 0.9850340136054422,
+      "recall_ai": 0.9603714143591444,
+      "f1_ai": 0.9725463856938964,
+      "precision_real": 0.9679338103756708,
+      "recall_real": 0.98794905737892,
+      "f1_real": 0.9778390222965189,
+      "f1_macro": 0.9751927039952076,
+      "mcc": 0.9506413079542492,
+      "fpr": 0.01205094262108002,
+      "fnr": 0.03962858564085558,
+      "confusion": {
+        "tn": 21643,
+        "fp": 264,
+        "fn": 717,
+        "tp": 17376
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.14854055643081665,
+      "accuracy": 0.976725,
+      "balanced_accuracy": 0.9761818809025056,
+      "precision_ai": 0.9778903987525062,
+      "recall_ai": 0.9704858232465594,
+      "f1_ai": 0.9741740408887902,
+      "precision_real": 0.9757757212847034,
+      "recall_real": 0.9818779385584516,
+      "f1_real": 0.9788173192873882,
+      "f1_macro": 0.9764956800880893,
+      "mcc": 0.9530147184512032,
+      "fpr": 0.018122061441548362,
+      "fnr": 0.029514176753440556,
+      "confusion": {
+        "tn": 21510,
+        "fp": 397,
+        "fn": 534,
+        "tp": 17559
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.98402332783012,
+    "ap": 0.9858545663555083,
+    "brier": 0.09709179954042492,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.8892,
+      "balanced_accuracy": 0.8925829260907732,
+      "precision_ai": 0.9872424532822233,
+      "recall_ai": 0.796203265384987,
+      "f1_ai": 0.8814909888229318,
+      "precision_real": 0.8189581187778922,
+      "recall_real": 0.9889625867965592,
+      "f1_real": 0.8959673254776771,
+      "f1_macro": 0.8887291571503044,
+      "mcc": 0.7956136997254576,
+      "fpr": 0.01103741320344077,
+      "fnr": 0.20379673461501305,
+      "confusion": {
+        "tn": 19085,
+        "fp": 213,
+        "fn": 4219,
+        "tp": 16483
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.0018675659084692597,
+      "accuracy": 0.937475,
+      "balanced_accuracy": 0.9374866103788528,
+      "precision_ai": 0.9417504004659968,
+      "recall_ai": 0.9371558303545551,
+      "f1_ai": 0.9394474977604532,
+      "precision_real": 0.9329346873550183,
+      "recall_real": 0.9378173904031506,
+      "f1_real": 0.9353696668992428,
+      "f1_macro": 0.937408582329848,
+      "mcc": 0.87482914242696,
+      "fpr": 0.06218260959684942,
+      "fnr": 0.06284416964544488,
+      "confusion": {
+        "tn": 18098,
+        "fp": 1200,
+        "fn": 1301,
+        "tp": 19401
+      }
+    }
+  }
+}

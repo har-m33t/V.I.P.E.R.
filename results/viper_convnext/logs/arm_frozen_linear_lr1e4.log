@@ -1,0 +1,120 @@
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] ConvNeXt-Frozen-Linear (no forensic): trainable 1,538/27,821,666 unfreeze_stages=0 head=linear feat_dim=0 lr=0.0001
+[viper] ep01 loss=0.4302 val_auc=0.9331 LOGO_auc=0.8598 [1.2min 1131 img/s]
+[viper] ep02 loss=0.3238 val_auc=0.9425 LOGO_auc=0.8783 [1.0min 1322 img/s]
+[viper] ep03 loss=0.3003 val_auc=0.9464 LOGO_auc=0.8836 [1.0min 1305 img/s]
+[viper] ep04 loss=0.2922 val_auc=0.9478 LOGO_auc=0.8886 [1.0min 1271 img/s]
+[viper] ep05 loss=0.2878 val_auc=0.9492 LOGO_auc=0.8900 [1.0min 1307 img/s]
+[viper] ep06 loss=0.2848 val_auc=0.9500 LOGO_auc=0.8912 [1.0min 1334 img/s]
+[viper] ep07 loss=0.2836 val_auc=0.9507 LOGO_auc=0.8922 [1.0min 1333 img/s]
+[viper] ep08 loss=0.2820 val_auc=0.9510 LOGO_auc=0.8929 [1.0min 1342 img/s]
+[viper] ep09 loss=0.2789 val_auc=0.9512 LOGO_auc=0.8931 [1.0min 1316 img/s]
+[viper] ep10 loss=0.2817 val_auc=0.9512 LOGO_auc=0.8931 [1.0min 1332 img/s]
+[viper] ep11 loss=0.2794 val_auc=0.9512 LOGO_auc=0.8932 [1.0min 1319 img/s]
+[viper] ep12 loss=0.2799 val_auc=0.9512 LOGO_auc=0.8932 [1.0min 1316 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.9512305629387012,
+    "ap": 0.9530164469849741,
+    "brier": 0.08038959735361555,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.89475,
+      "balanced_accuracy": 0.8909120157277104,
+      "precision_ai": 0.9107639505296171,
+      "recall_ai": 0.8506604764273475,
+      "f1_ai": 0.8796867855509831,
+      "precision_real": 0.8830353664343535,
+      "recall_real": 0.9311635550280732,
+      "f1_real": 0.9064610735869179,
+      "f1_macro": 0.8930739295689505,
+      "mcc": 0.7877889197972582,
+      "fpr": 0.06883644497192679,
+      "fnr": 0.1493395235726524,
+      "confusion": {
+        "tn": 20399,
+        "fp": 1508,
+        "fn": 2702,
+        "tp": 15391
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.45550134778022766,
+      "accuracy": 0.89475,
+      "balanced_accuracy": 0.8923938782624734,
+      "precision_ai": 0.8963174421924065,
+      "recall_ai": 0.8676836345548002,
+      "f1_ai": 0.881768141990564,
+      "precision_real": 0.8935290193462309,
+      "recall_real": 0.9171041219701466,
+      "f1_real": 0.9051630924490899,
+      "f1_macro": 0.893465617219827,
+      "mcc": 0.7873130460941663,
+      "fpr": 0.08289587802985347,
+      "fnr": 0.1323163654451998,
+      "confusion": {
+        "tn": 20091,
+        "fp": 1816,
+        "fn": 2394,
+        "tp": 15699
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.8932214339888888,
+    "ap": 0.8860404492074387,
+    "brier": 0.16668970812506062,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.74945,
+      "balanced_accuracy": 0.7556494777130373,
+      "precision_ai": 0.9016849706634572,
+      "recall_ai": 0.5790261810453097,
+      "f1_ai": 0.7052006118366867,
+      "precision_real": 0.6736688384632666,
+      "recall_real": 0.9322727743807648,
+      "f1_real": 0.7821493783149291,
+      "f1_macro": 0.7436749950758079,
+      "mcc": 0.5423816014642339,
+      "fpr": 0.06772722561923515,
+      "fnr": 0.4209738189546904,
+      "confusion": {
+        "tn": 17991,
+        "fp": 1307,
+        "fn": 8715,
+        "tp": 11987
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.2091464400291443,
+      "accuracy": 0.820675,
+      "balanced_accuracy": 0.8184919227337272,
+      "precision_ai": 0.7949422280357532,
+      "recall_ai": 0.8806878562457734,
+      "f1_ai": 0.8356211471916034,
+      "precision_real": 0.855259302666276,
+      "recall_real": 0.756295989221681,
+      "f1_real": 0.8027390479333388,
+      "f1_macro": 0.8191800975624711,
+      "mcc": 0.6435587551695678,
+      "fpr": 0.243704010778319,
+      "fnr": 0.11931214375422665,
+      "confusion": {
+        "tn": 14595,
+        "fp": 4703,
+        "fn": 2470,
+        "tp": 18232
+      }
+    }
+  }
+}

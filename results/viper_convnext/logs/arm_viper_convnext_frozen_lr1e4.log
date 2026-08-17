@@ -1,0 +1,122 @@
+[viper] loaded forensic features: 160,000 uids x 33 dims
+[viper] train: 80,000
+[viper] val: 40,000
+[viper] logo: 40,000
+[viper] forensic features: 33 dims, standardized on train (n=80,000)
+[viper] VIPER-ConvNeXt-Frozen-MLP: trainable 308,738/28,128,866 unfreeze_stages=0 head=mlp feat_dim=33 lr=0.0001
+[viper] ep01 loss=0.2854 val_auc=0.9656 LOGO_auc=0.9098 [1.2min 1139 img/s]
+[viper] ep02 loss=0.2109 val_auc=0.9716 LOGO_auc=0.9164 [1.0min 1325 img/s]
+[viper] ep03 loss=0.1905 val_auc=0.9747 LOGO_auc=0.9283 [1.0min 1358 img/s]
+[viper] ep04 loss=0.1766 val_auc=0.9762 LOGO_auc=0.9350 [1.0min 1336 img/s]
+[viper] ep05 loss=0.1668 val_auc=0.9765 LOGO_auc=0.9284 [1.0min 1340 img/s]
+[viper] ep06 loss=0.1589 val_auc=0.9773 LOGO_auc=0.9369 [1.0min 1339 img/s]
+[viper] ep07 loss=0.1508 val_auc=0.9782 LOGO_auc=0.9390 [1.0min 1323 img/s]
+[viper] ep08 loss=0.1471 val_auc=0.9788 LOGO_auc=0.9379 [1.0min 1361 img/s]
+[viper] ep09 loss=0.1432 val_auc=0.9787 LOGO_auc=0.9384 [1.0min 1356 img/s]
+[viper] ep10 loss=0.1400 val_auc=0.9788 LOGO_auc=0.9397 [1.0min 1363 img/s]
+[viper] ep11 loss=0.1378 val_auc=0.9788 LOGO_auc=0.9391 [1.0min 1354 img/s]
+[viper] ep12 loss=0.1379 val_auc=0.9789 LOGO_auc=0.9391 [1.0min 1377 img/s]
+{
+  "val": {
+    "n": 40000,
+    "n_ai": 18093,
+    "n_real": 21907,
+    "auc": 0.9788100502258595,
+    "ap": 0.9783372825108223,
+    "brier": 0.05475511769941014,
+    "majority_baseline_accuracy": 0.547675,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.92635,
+      "balanced_accuracy": 0.9220610156764972,
+      "precision_ai": 0.956482430233259,
+      "recall_ai": 0.8770795335212513,
+      "f1_ai": 0.9150616999192711,
+      "precision_real": 0.9049938058011876,
+      "recall_real": 0.9670424978317432,
+      "f1_real": 0.9349898490599347,
+      "f1_macro": 0.9250257744896029,
+      "mcc": 0.8527549884484574,
+      "fpr": 0.03295750216825672,
+      "fnr": 0.12292046647874869,
+      "confusion": {
+        "tn": 21185,
+        "fp": 722,
+        "fn": 2224,
+        "tp": 15869
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.3345894515514374,
+      "accuracy": 0.92775,
+      "balanced_accuracy": 0.9261441000381492,
+      "precision_ai": 0.9294390147449296,
+      "recall_ai": 0.9093019399767867,
+      "f1_ai": 0.9192602112085825,
+      "precision_real": 0.9264092560204493,
+      "recall_real": 0.9429862600995116,
+      "f1_real": 0.9346242591503415,
+      "f1_macro": 0.9269422351794621,
+      "mcc": 0.8540663804582388,
+      "fpr": 0.05701373990048843,
+      "fnr": 0.0906980600232134,
+      "confusion": {
+        "tn": 20658,
+        "fp": 1249,
+        "fn": 1641,
+        "tp": 16452
+      }
+    }
+  },
+  "logo": {
+    "n": 40000,
+    "n_ai": 20702,
+    "n_real": 19298,
+    "auc": 0.9396664835043421,
+    "ap": 0.9415911162640866,
+    "brier": 0.1452503297437588,
+    "majority_baseline_accuracy": 0.51755,
+    "at_0.5": {
+      "threshold": 0.5,
+      "accuracy": 0.79705,
+      "balanced_accuracy": 0.8028337592196964,
+      "precision_ai": 0.9548214543877404,
+      "recall_ai": 0.638054294271085,
+      "f1_ai": 0.7649409312022237,
+      "precision_real": 0.7136360162042346,
+      "recall_real": 0.9676132241683076,
+      "f1_real": 0.8214411402428294,
+      "f1_macro": 0.7931910357225266,
+      "mcc": 0.6362884388354976,
+      "fpr": 0.0323867758316924,
+      "fnr": 0.3619457057289151,
+      "confusion": {
+        "tn": 18673,
+        "fp": 625,
+        "fn": 7493,
+        "tp": 13209
+      }
+    },
+    "at_best_f1": {
+      "threshold": 0.12463856488466263,
+      "accuracy": 0.86935,
+      "balanced_accuracy": 0.8685316596900547,
+      "precision_ai": 0.8607459207459207,
+      "recall_ai": 0.8918461984349338,
+      "f1_ai": 0.876020117669387,
+      "precision_real": 0.8792991913746631,
+      "recall_real": 0.8452171209451756,
+      "f1_real": 0.8619213696892835,
+      "f1_macro": 0.8689707436793352,
+      "mcc": 0.7385527109358023,
+      "fpr": 0.15478287905482432,
+      "fnr": 0.10815380156506618,
+      "confusion": {
+        "tn": 16311,
+        "fp": 2987,
+        "fn": 2239,
+        "tp": 18463
+      }
+    }
+  }
+}
