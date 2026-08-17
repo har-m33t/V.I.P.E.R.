@@ -544,7 +544,7 @@ def score_lab_saturation(
     Score LAB chroma saturation against the reference corpus.
 
     Legacy feature matrices may not contain the new LAB columns yet. In that case,
-    the scorer falls back to the existing hue spread statistic so dashboards do not
+    the scorer falls back to the existing hue spread statistic so callers do not
     hard-fail on older artifacts.
     """
     reference_df = reference_df if reference_df is not None else load_reference_feature_matrix()
@@ -578,7 +578,7 @@ def score_forensic_signals(
     reference_df: Optional[pd.DataFrame] = None,
 ) -> Dict[str, Dict[str, Any]]:
     """
-    Return the standardized dashboard-ready anomaly buckets for the three signals.
+    Return the standardized anomaly buckets for the three signals.
     """
     reference_df = reference_df if reference_df is not None else load_reference_feature_matrix()
     return {
@@ -606,7 +606,7 @@ def build_forensic_report(
     confidence_mode: str = "predicted_class",
 ) -> Dict[str, Any]:
     """
-    Assemble a strict forensic report object for dashboard or API rendering.
+    Assemble a strict forensic report object for downstream reporting.
 
     Args:
         prediction: Model output label as index or string.
