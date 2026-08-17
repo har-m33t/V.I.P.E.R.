@@ -1,7 +1,7 @@
 """
 src/dataloader.py - VIPER Forensic Engine Data Layer
 
-Phase 3.1 keeps the pipeline image-only by default while Phase 3.2 can opt into
+The pipeline is image-only by default; the fused path can opt into
 late-fusion by attaching standardized EDA feature vectors from
 results/feature_matrix.csv.
 """
@@ -21,6 +21,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
+from torch.utils.data.distributed import DistributedSampler
 from torchvision import transforms
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -33,9 +34,12 @@ from src.config import (
     FEATURE_MATRIX_CSV,
     IMAGE_EMBED_DIM,
     IMAGE_SIZE,
+    JPEG_DRAFT,
     LABEL_AI,
     LABEL_REAL,
+    MAX_SAMPLES,
     NUM_WORKERS,
+    PREFETCH_FACTOR,
     REAL_ART_DIR,
     RESULTS_DIR,
     SEED,
@@ -46,7 +50,6 @@ from src.config import (
 )
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
-MAX_SAMPLES_FAST_TRACK = 10000
 HIGH_CONFIDENCE_THRESHOLD = 0.80
 
 
@@ -73,7 +76,7 @@ def _confidence_bucket(confidence: float) -> str:
 
 
 def get_train_transform() -> transforms.Compose:
-    """Standard Phase 3.1 augmentation: flip + color jitter only."""
+    """Standard augmentation: flip + color jitter only."""
     return transforms.Compose([
         transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
         transforms.RandomHorizontalFlip(p=0.5),
@@ -103,14 +106,14 @@ def get_val_transform() -> transforms.Compose:
     ])
 
 
-class ArtDataset(Dataset):
+class VIPERImageDataset(Dataset):
     """
     Binary classification dataset for AI-generated vs real art images.
 
     When `feature_dim > 0`, each sample returns:
         (image_tensor, eda_features_tensor, label, path)
 
-    Otherwise it returns the original Phase 3.1 tuple:
+    Otherwise it returns the image-only tuple:
         (image_tensor, label, path)
     """
 
@@ -142,7 +145,13 @@ class ArtDataset(Dataset):
         path = self.image_paths[idx]
         label = self.labels[idx]
         try:
-            image = Image.open(path).convert("RGB")
+            image = Image.open(path)
+            if JPEG_DRAFT:
+                # Ask libjpeg for the smallest DCT-scaled decode that still
+                # covers IMAGE_SIZE. On 512px sources this halves decode cost,
+                # which is the real bottleneck once the model is on a GPU.
+                image.draft("RGB", (IMAGE_SIZE, IMAGE_SIZE))
+            image = image.convert("RGB")
         except Exception:
             image = Image.new("RGB", (IMAGE_SIZE, IMAGE_SIZE), color=0)
         image = self.transform(image)
@@ -287,9 +296,18 @@ def get_dataloaders(
     use_eda_features: bool = USE_EDA_FEATURES,
     feature_csv: Path = FEATURE_MATRIX_CSV,
     strict_eda_coverage: bool = STRICT_EDA_COVERAGE,
+    max_samples: int = MAX_SAMPLES,
+    distributed: bool = False,
+    rank: int = 0,
+    world_size: int = 1,
 ) -> Tuple[DataLoader, DataLoader, DataLoader]:
     """
     Build train / val / test DataLoaders for binary art classification.
+
+    The split itself is rank-independent: every process shuffles the same index
+    list with the same seed, then DistributedSampler carves disjoint shards out
+    of it. That keeps the train/val/test boundaries identical to a single-GPU
+    run no matter how many GPUs are used.
     """
     effective_num_workers = 0 if sys.platform == "win32" else num_workers
 
@@ -309,10 +327,12 @@ def get_dataloaders(
     indices = list(range(len(all_paths)))
     rng.shuffle(indices)
 
-    if len(indices) > MAX_SAMPLES_FAST_TRACK:
-        indices = indices[:MAX_SAMPLES_FAST_TRACK]
+    if max_samples and max_samples > 0 and len(indices) > max_samples:
+        indices = indices[:max_samples]
         if verbose:
-            print(f"[DataAgent] ⚡ FAST-TRACK ENGAGED: Sub-sampled to {MAX_SAMPLES_FAST_TRACK} images.")
+            print(f"[DataAgent] ⚡ FAST-TRACK ENGAGED: Sub-sampled to {max_samples} images.")
+    elif verbose:
+        print(f"[DataAgent] FULL-SCALE: using all {len(indices)} images (no subsample cap).")
 
     n_total = len(indices)
     n_test = int(n_total * test_split)
@@ -338,23 +358,52 @@ def get_dataloaders(
         transform: transforms.Compose,
         shuffle: bool,
     ) -> DataLoader:
+        if distributed and not shuffle:
+            # Evaluation splits are strided across ranks rather than handed to
+            # DistributedSampler, which pads the tail by repeating samples —
+            # that would double-count images in the validation metrics. A plain
+            # stride gives disjoint shards whose union is exactly the split.
+            idx_list = idx_list[rank::world_size]
+
         paths = [all_paths[i] for i in idx_list]
         labels = [all_labels[i] for i in idx_list]
-        dataset = ArtDataset(
+        dataset = VIPERImageDataset(
             image_paths=paths,
             labels=labels,
             transform=transform,
             feature_lookup=feature_lookup,
             feature_dim=feature_dim,
         )
-        return DataLoader(
-            dataset,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            num_workers=effective_num_workers,
-            pin_memory=torch.cuda.is_available(),
-            drop_last=shuffle,
-        )
+
+        sampler = None
+        if distributed and shuffle:
+            sampler = DistributedSampler(
+                dataset,
+                num_replicas=world_size,
+                rank=rank,
+                shuffle=True,
+                seed=seed,
+                drop_last=True,
+            )
+
+        loader_kwargs: Dict[str, Any] = {
+            "batch_size": batch_size,
+            "num_workers": effective_num_workers,
+            "pin_memory": torch.cuda.is_available(),
+            "drop_last": shuffle and sampler is None,
+        }
+        if sampler is not None:
+            loader_kwargs["sampler"] = sampler
+        else:
+            loader_kwargs["shuffle"] = shuffle
+
+        if effective_num_workers > 0:
+            # Respawning workers every epoch costs seconds per epoch at this
+            # dataset size; keeping them alive removes that entirely.
+            loader_kwargs["persistent_workers"] = True
+            loader_kwargs["prefetch_factor"] = PREFETCH_FACTOR
+
+        return DataLoader(dataset, **loader_kwargs)
 
     train_loader = _make_loader(train_idx, get_train_transform(), shuffle=True)
     val_loader = _make_loader(val_idx, get_val_transform(), shuffle=False)
@@ -370,8 +419,9 @@ def get_dataloaders(
                 f"[DataAgent] Hybrid fusion enabled with {feature_dim} EDA features."
             )
         print(
-            f"[DataAgent] DataLoaders ready. batch_size={batch_size}, "
-            f"num_workers={effective_num_workers}"
+            f"[DataAgent] DataLoaders ready. batch_size={batch_size}/gpu, "
+            f"num_workers={effective_num_workers}, distributed={distributed}"
+            + (f" (world_size={world_size})" if distributed else "")
         )
 
     return train_loader, val_loader, test_loader
@@ -381,10 +431,10 @@ def get_full_dataset(
     ai_dir: Path = AI_ART_DIR,
     real_dir: Path = REAL_ART_DIR,
     transform=None,
-) -> ArtDataset:
+) -> VIPERImageDataset:
     ai_paths, ai_labels = _collect_images(ai_dir, LABEL_AI)
     real_paths, real_labels = _collect_images(real_dir, LABEL_REAL)
-    return ArtDataset(
+    return VIPERImageDataset(
         ai_paths + real_paths,
         ai_labels + real_labels,
         transform=transform or get_val_transform(),
@@ -476,8 +526,8 @@ def precompute_validation_artifacts(
     """
     Precompute validation-set predictions, confidences, and 768D embeddings.
 
-    The dashboard can read these artifacts directly instead of running model
-    inference on every load.
+    Downstream analysis (error breakdown, UMAP, reporting) reads these artifacts
+    from results/ instead of re-running model inference each time.
     """
     from src.model import load_checkpoint
 
@@ -620,7 +670,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--precompute-validation",
         action="store_true",
-        help="Write validation predictions/confidences/embeddings for the Streamlit dashboard.",
+        help="Write validation predictions/confidences/embeddings to results/.",
     )
     args = parser.parse_args()
 
